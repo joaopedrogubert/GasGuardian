@@ -2,7 +2,7 @@ from ..entidades.usuario import Usuario
 import sqlite3
 import hashlib
 
-class ControladorPessoa:
+class ControladorUsuario:
     def __init__(self):
         # Conectar ao banco de dados
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/gas-guardian/Raillan/dados/dadosPosto.sqlite')
