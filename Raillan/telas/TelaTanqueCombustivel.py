@@ -2,26 +2,24 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
 
-class TelaTanqueCombustivel(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+from ..controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
 
-        self.title("Listar Usuários")
-        self.attributes('-fullscreen', True)
-        self.controlador = Controlador()
-
+class TelaTanqueCombustivel(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
         self.selected_row = None
 
-        self.tela_listar_usuarios()
-
-    def tela_listar_usuarios(self):
+    def tela_listar_tanques(self):
+        cabecalhos = None
+        tanques = None
         self.clear_frame()
 
         top_frame = ctk.CTkFrame(self)
         top_frame.pack(fill="x", padx=20, pady=10)
 
         # Título alinhado à esquerda com fonte maior
-        ctk.CTkLabel(top_frame, text="Lista de Usuários", font=("Arial", 20)).pack(side="left")
+        ctk.CTkLabel(top_frame, text="Lista de Usuários", font=("Arial", 25,"bold")).pack(side="left")
 
         # Botões alinhados à direita
         btn_frame = ctk.CTkFrame(top_frame)
@@ -30,19 +28,19 @@ class TelaTanqueCombustivel(ctk.CTk):
         btn_add = ctk.CTkButton(btn_frame, text="+", command=self.cadastrar_tanque)
         btn_add.pack(side="left", padx=5)
 
-        self.btn_alterar = ctk.CTkButton(btn_frame, text="Alterar", command=self.alterar_usuario, state=tk.DISABLED)
+        self.btn_alterar = ctk.CTkButton(btn_frame, text="Alterar", command=self.alterar_tanque, state=tk.DISABLED)
         self.btn_alterar.pack(side="left", padx=5)
 
-        self.btn_excluir = ctk.CTkButton(btn_frame, text="Excluir", command=self.excluir_usuario, state=tk.DISABLED)
+        self.btn_excluir = ctk.CTkButton(btn_frame, text="Excluir", command=self.excluir_tanque, state=tk.DISABLED)
         self.btn_excluir.pack(side="left", padx=5)
 
-        # Obtendo dados e cabeçalhos do backend
-        usuarios, cabecalhos = self.controlador.listar_usuarios()
 
         # Criando a tabela responsiva com barra de rolagem horizontal
-        self.criar_tabela(usuarios, cabecalhos)
+        self.criar_tabela(cabecalhos, tanques )
 
-        ctk.CTkButton(self, text="Voltar", command=self.menu_principal).pack(pady=10)
+        # Adicionando botão de pesquisa na parte inferior direita
+        btn_pesquisar = ctk.CTkButton(self, text="Pesquisar", command=self.pesquisar)
+        btn_pesquisar.pack(side="bottom", anchor="se", padx=10, pady=10)
 
     def criar_tabela(self, dados, cabecalhos):
         # Frame container para Treeview e Scrollbar com espaçamento
@@ -73,8 +71,8 @@ class TelaTanqueCombustivel(ctk.CTk):
             self.tree.column(col, anchor="center")
 
         # Configurando as tags para cores alternadas
-        self.tree.tag_configure('evenrow', background='#544F59')
-        self.tree.tag_configure('oddrow', background='#262526')
+        self.tree.tag_configure('evenrow', background='#E6E6E6')
+        self.tree.tag_configure('oddrow', background='#FFFFFF')
 
         # Inserindo dados na tabela
         for index, row in enumerate(dados):
@@ -91,15 +89,20 @@ class TelaTanqueCombustivel(ctk.CTk):
             self.btn_alterar.configure(state=tk.DISABLED)
             self.btn_excluir.configure(state=tk.DISABLED)
 
-    def alterar_usuario(self):
+    def alterar_tanque(self):
         if self.selected_row:
             # Lógica para alterar as informações do usuário
             print(f"Alterar usuário: {self.selected_row}")
 
-    def excluir_usuario(self):
+    def excluir_tanque(self):
         if self.selected_row:
             # Lógica para excluir o usuário
             print(f"Excluir usuário: {self.selected_row}")
+
+    def pesquisar(self):
+        # Lógica para pesquisar e carregar os dados na grid
+        self.clear_frame()
+        return self.controladorTanqueCombustivel.listar_tanques()
 
     def clear_frame(self):
         for widget in self.winfo_children():
@@ -113,16 +116,8 @@ class TelaTanqueCombustivel(ctk.CTk):
         # Lógica para abrir a tela de cadastro de novo tanque
         print("Abrir tela de cadastro de novo tanque")
 
-class Controlador:
-    def listar_usuarios(self):
-        # Dados fictícios e cabeçalhos dinâmicos de exemplo
-        dados = [
-            ("Maria Oliveira", "987.654.321-00", "maria.oliveira@email.com", "21 98765-4321"),
-            ("Carlos Andrade", "222.333.444-55", "carlos.andrade@email.com", "31 91234-5678")
-        ]
-        cabecalhos = ["Nome", "CPF", "Email", "Telefone"]
-        return dados, cabecalhos
 
 if __name__ == '__main__':
+    ctk.set_appearance_mode("light")  # Define o modo de aparência para claro
     app = TelaTanqueCombustivel()
     app.mainloop()

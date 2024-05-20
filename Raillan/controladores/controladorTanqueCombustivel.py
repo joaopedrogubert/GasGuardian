@@ -43,9 +43,16 @@ class ControladorTanqueCombustivel:
                 raise
 
     def listar_tanques(self):
-        # Listar todos os tanques do banco de dados
+        # Executar a consulta SQL para obter todos os tanques
         self.cursor.execute("SELECT * FROM Tanques")
-        return self.cursor.fetchall()
+        
+        # Obter os cabeçalhos das colunas
+        cabecalhos = [description[0] for description in self.cursor.description]
+        
+        # Obter todos os dados
+        tanques = self.cursor.fetchall()
+
+        return cabecalhos, tanques
     
     def buscar_tanque(self, identificadorTanque):
         # Buscar um tanque específico pelo Identificador
