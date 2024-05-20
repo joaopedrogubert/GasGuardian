@@ -82,3 +82,6 @@ class TelaUsuario(ctk.CTk):
             ctk.CTkLabel(self, text="Nenhum usuário cadastrado.").pack(pady=20)
         ctk.CTkButton(self, text="Voltar", command=self.menu_principal).pack(pady=10)
     
+if __name__ == '__main__':
+    app = TelaUsuario()
+    app.mainloop()

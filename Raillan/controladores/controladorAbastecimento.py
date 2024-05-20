@@ -9,7 +9,7 @@ class ControladorAbastecimento:
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS Abastecimentos (
             IdentificadorAbastecimento INTEGER PRIMARY KEY AUTOINCREMENT,
-            IdentificadorBomba INTEGER NOT NULL,
+            IdentificadorBomba INTEGER NOT NULL ,
             data TEXT NOT NULL,
             litros REAL NOT NULL,
             valorTotal REAL NOT NULL,
