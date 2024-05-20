@@ -1,25 +1,27 @@
+from controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
-
-from ..controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
 
 class TelaTanqueCombustivel(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
         self.selected_row = None
+        self.tela_listar_tanques()
 
     def tela_listar_tanques(self):
-        cabecalhos = None
-        tanques = None
+        # Supondo que esses valores são fornecidos pelo controlador
+        cabecalhos = ["ID", "Nome", "Capacidade"]
+        tanques = self.controladorTanqueCombustivel.listar_tanques()
+        
         self.clear_frame()
 
         top_frame = ctk.CTkFrame(self)
         top_frame.pack(fill="x", padx=20, pady=10)
 
         # Título alinhado à esquerda com fonte maior
-        ctk.CTkLabel(top_frame, text="Lista de Usuários", font=("Arial", 25,"bold")).pack(side="left")
+        ctk.CTkLabel(top_frame, text="Lista de Tanques", font=("Arial", 25, "bold")).pack(side="left")
 
         # Botões alinhados à direita
         btn_frame = ctk.CTkFrame(top_frame)
@@ -34,9 +36,8 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.btn_excluir = ctk.CTkButton(btn_frame, text="Excluir", command=self.excluir_tanque, state=tk.DISABLED)
         self.btn_excluir.pack(side="left", padx=5)
 
-
         # Criando a tabela responsiva com barra de rolagem horizontal
-        self.criar_tabela(cabecalhos, tanques )
+        self.criar_tabela(tanques, cabecalhos)
 
         # Adicionando botão de pesquisa na parte inferior direita
         btn_pesquisar = ctk.CTkButton(self, text="Pesquisar", command=self.pesquisar)
@@ -91,18 +92,20 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
     def alterar_tanque(self):
         if self.selected_row:
-            # Lógica para alterar as informações do usuário
-            print(f"Alterar usuário: {self.selected_row}")
+            # Lógica para alterar as informações do tanque
+            print(f"Alterar tanque: {self.selected_row}")
 
     def excluir_tanque(self):
         if self.selected_row:
-            # Lógica para excluir o usuário
-            print(f"Excluir usuário: {self.selected_row}")
+            # Lógica para excluir o tanque
+            print(f"Excluir tanque: {self.selected_row}")
 
     def pesquisar(self):
         # Lógica para pesquisar e carregar os dados na grid
         self.clear_frame()
-        return self.controladorTanqueCombustivel.listar_tanques()
+        cabecalhos = ["ID", "Nome", "Capacidade"]
+        tanques = self.controladorTanqueCombustivel.listar_tanques()
+        self.criar_tabela(tanques, cabecalhos)
 
     def clear_frame(self):
         for widget in self.winfo_children():
@@ -119,5 +122,8 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
 if __name__ == '__main__':
     ctk.set_appearance_mode("light")  # Define o modo de aparência para claro
-    app = TelaTanqueCombustivel()
-    app.mainloop()
+    root = tk.Tk()
+    root.geometry("800x600")
+    app = TelaTanqueCombustivel(root)
+    app.pack(fill="both", expand=True)
+    root.mainloop()

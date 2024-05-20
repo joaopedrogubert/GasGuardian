@@ -1,5 +1,5 @@
 import sqlite3
-from ..entidades.tanqueCombustivel import TanqueCombustivel
+from entidades.tanqueCombustivel import TanqueCombustivel
 
 class ControladorTanqueCombustivel:
     def __init__(self):
