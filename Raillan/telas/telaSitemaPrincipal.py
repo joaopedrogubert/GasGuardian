@@ -23,7 +23,7 @@ class MenuPrincipal(ctk.CTk):
         self.frames = {}
 
     def configure_grid(self):
-        self.grid_columnconfigure(0, weight=0, minsize=200)  # Largura fixa do menu
+        self.grid_columnconfigure(0, weight=0, minsize=300)  # Largura fixa do menu
         self.grid_columnconfigure(1, weight=4)
         self.grid_rowconfigure(0, weight=1)
 
@@ -58,7 +58,7 @@ class MenuPrincipal(ctk.CTk):
 
         # Adicionando itens ao menu
         icon_path_base = "/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/telas/Icones/"
-        self.add_menu_item("", "abastecimentos", "Abastecimentos", icon_path_base + "afundando.png", True)
+        self.add_menu_item("", "abastecimento", "Abastecimento", icon_path_base + "afundando.png", True)
         self.add_separator(self.menu_frame)
         
         # Adicionando item "Cadastro" com ícone
@@ -93,6 +93,7 @@ class MenuPrincipal(ctk.CTk):
         if os.path.exists(path):
             image = Image.open(path)
             image = image.resize((25, 25), Image.LANCZOS)
+
             photo = ImageTk.PhotoImage(image)
             self.images.append(photo)  # Adiciona a imagem à lista para evitar coleta de lixo
             return photo
