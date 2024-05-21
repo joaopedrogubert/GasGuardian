@@ -1,7 +1,7 @@
 import sqlite3
 
 # Caminho do banco de dados
-db_path = '/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/dadosPosto.sqlite'
+db_path = '/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite'
 
 # Caminho do arquivo SQL
 sql_file_path = '/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/create_and_insert_data.sql'

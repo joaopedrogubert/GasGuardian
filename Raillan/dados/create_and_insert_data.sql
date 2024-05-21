@@ -20,10 +20,10 @@ INSERT INTO TipoCombustivel (id, nome, preco) VALUES (10, 'Óleo Combustível', 
 -- Criar a tabela Tanques
 CREATE TABLE IF NOT EXISTS Tanques (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    capacidadeMaxima INTEGER NOT NULL,
-    porcentagemAlerta INTEGER NOT NULL,
+    capacidadeMaxima REAL NOT NULL,
+    porcentagemAlerta REAL NOT NULL,
     tipoCombustivel_id INTEGER NOT NULL,
-    volumeAtual INTEGER NOT NULL,
+    volumeAtual REAL NOT NULL,
     FOREIGN KEY (tipoCombustivel_id) REFERENCES TipoCombustivel (id)
 );
 

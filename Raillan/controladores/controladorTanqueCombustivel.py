@@ -3,7 +3,7 @@ from entidades.tanqueCombustivel import TanqueCombustivel
 
 class ControladorTanqueCombustivel:
     def __init__(self):
-        self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/gas-guardian/Raillan/dados/dadosTanqueCombustivel.sqlite')
+        self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
         self.__tanque = TanqueCombustivel
         self.cursor.execute('''
@@ -45,14 +45,10 @@ class ControladorTanqueCombustivel:
     def listar_tanques(self):
         # Executar a consulta SQL para obter todos os tanques
         self.cursor.execute("SELECT * FROM Tanques")
-        
-        # Obter os cabeçalhos das colunas
-        cabecalhos = [description[0] for description in self.cursor.description]
-        
+
         # Obter todos os dados
         tanques = self.cursor.fetchall()
-
-        return cabecalhos, tanques
+        return tanques
     
     def buscar_tanque(self, identificadorTanque):
         # Buscar um tanque específico pelo Identificador

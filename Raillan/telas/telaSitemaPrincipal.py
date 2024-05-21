@@ -22,6 +22,7 @@ class MenuPrincipal(ctk.CTk):
 
         # Inicializando os frames
         self.frames = {}
+        self.current_frame = None
         self.create_frames()
 
     def configure_grid(self):
@@ -31,39 +32,29 @@ class MenuPrincipal(ctk.CTk):
 
     def create_menu(self):
         # Menu lateral
-        self.menu_frame = ctk.CTkFrame(self, fg_color="lightgrey", width=200)
+        self.menu_frame = ctk.CTkFrame(self, width=200)
         self.menu_frame.grid(row=0, column=0, sticky="nswe", padx=10, pady=10)
 
         # Label do Menu
-        ctk.CTkLabel(self.menu_frame, text="Menu", font=("Arial", 30, "bold"), fg_color="lightgrey").pack(pady=20)
+        ctk.CTkLabel(self.menu_frame, text="Posto do Chico", font=("Arial", 30, "bold")).pack(pady=20)
 
         self.tree_menu = ttk.Treeview(self.menu_frame, show="tree", selectmode="browse")
         self.tree_menu.pack(fill="both", expand=True)
 
-        # Configurações de estilo aplicadas ao Treeview do menu
+        # Ajustar a altura das linhas
         style = ttk.Style()
-        style.configure("Treeview", 
-                        font=("Arial", 25, "bold"),   # Fonte das opções do menu
-                        rowheight=50,                # Altura das linhas
-                        background="lightgrey",      # Fundo das linhas
-                        fieldbackground="lightgrey", # Fundo do campo de entrada
-                        foreground="black")          # Cor do texto
-        style.configure("Treeview.Heading", font=("Arial", 30, "bold"))
-        style.layout("Treeview.Item", [('Treeitem.padding', {'sticky': 'nswe', 'children': [('Treeitem.indicator', {'side': 'left', 'sticky': ''}), ('Treeitem.image', {'side': 'left', 'sticky': ''}), ('Treeitem.text', {'side': 'left', 'sticky': ''})]})])
-        style.configure("Treeitem.indicator", indicatorcolor="black")
+        style.configure("Treeview", rowheight=50)
 
         # Adicionando itens ao menu
         icon_path_base = "/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/telas/Icones/"
         self.add_menu_item("", "abastecimento", "Abastecimento", icon_path_base + "afundando.png", True)
-        self.add_separator(self.menu_frame)
-        
+
         # Adicionando item "Cadastro" com ícone
         cadastro_id = self.add_menu_item("", "cadastro", "Cadastro", icon_path_base + "cadastro.png", True)
         self.add_menu_item(cadastro_id, "funcionarios", "Funcionários", icon_path_base + "Funcionarios.png")
         self.add_menu_item(cadastro_id, "tanques", "Tanques", icon_path_base + "tanquesCombustivel.png")
         self.add_menu_item(cadastro_id, "combustiveis", "Combustíveis", icon_path_base + "oil.png")
         self.add_menu_item(cadastro_id, "bombas", "Bombas", icon_path_base + "bomba-de-gasolina.png")
-        self.add_separator(self.menu_frame)
 
         self.add_menu_item("", "relatorios", "Relatórios", icon_path_base + "relatorios.png", True)
 
@@ -89,10 +80,6 @@ class MenuPrincipal(ctk.CTk):
         else:
             return self.tree_menu.insert(parent, "end", id, text=text, tags=("main" if is_main else "sub",))
 
-    def add_separator(self, parent):
-        separator = ctk.CTkFrame(parent, height=2, fg_color="black")
-        separator.pack(fill="x", padx=5, pady=2)
-
     def get_icon(self, path):
         if os.path.exists(path):
             image = Image.open(path)
@@ -111,14 +98,16 @@ class MenuPrincipal(ctk.CTk):
 
     def show_frame(self, frame_name):
         # Ocultar todos os frames
-        for frame in self.frames.values():
-            frame.grid_remove()
+        if self.current_frame:
+            self.current_frame.grid_remove()
+
         # Mostrar o frame selecionado
         frame = self.frames.get(frame_name)
         if frame:
-            frame.grid()
+            frame.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
+            self.current_frame = frame
 
 if __name__ == '__main__':
-    ctk.set_appearance_mode("light")  # Define o modo de aparência para claro
+    ctk.set_appearance_mode("system")
     app = MenuPrincipal()
     app.mainloop()

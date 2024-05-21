@@ -8,13 +8,11 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         super().__init__(parent)
         self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
         self.selected_row = None
+        self.cabecalhos = ["Nome", "Capacidade", "Combustível", "Status"]
+        self.tanques = self.controladorTanqueCombustivel.listar_tanques()
         self.tela_listar_tanques()
 
     def tela_listar_tanques(self):
-        # Supondo que esses valores são fornecidos pelo controlador
-        cabecalhos = ["ID", "Nome", "Capacidade"]
-        tanques = self.controladorTanqueCombustivel.listar_tanques()
-        
         self.clear_frame()
 
         top_frame = ctk.CTkFrame(self)
@@ -37,7 +35,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.btn_excluir.pack(side="left", padx=5)
 
         # Criando a tabela responsiva com barra de rolagem horizontal
-        self.criar_tabela(tanques, cabecalhos)
+        self.criar_tabela(self.tanques, self.cabecalhos)
 
         # Adicionando botão de pesquisa na parte inferior direita
         btn_pesquisar = ctk.CTkButton(self, text="Pesquisar", command=self.pesquisar)
@@ -54,7 +52,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
         self.tree = ttk.Treeview(container, columns=cabecalhos, show="headings", height=8,
                                  xscrollcommand=scrollbar_x.set, yscrollcommand=scrollbar_y.set)
-        
+
         scrollbar_x.pack(side="bottom", fill="x")
         scrollbar_y.pack(side="right", fill="y")
 
@@ -65,7 +63,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
         # Adicionando evento de seleção de linha
         self.tree.bind("<<TreeviewSelect>>", self.on_row_select)
-        
+
         # Configurando as colunas
         for col in cabecalhos:
             self.tree.heading(col, text=col)
@@ -76,13 +74,13 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.tree.tag_configure('oddrow', background='#FFFFFF')
 
         # Inserindo dados na tabela
-        for index, row in enumerate(dados):
-            self.tree.insert('', 'end', values=row, tags=('evenrow' if index % 2 == 0 else 'oddrow'))
+        self.update_table(dados)
 
     def on_row_select(self, event):
         selected_item = self.tree.selection()
         if selected_item:
             self.selected_row = self.tree.item(selected_item[0], "values")
+            print(f"Selecionado: {self.selected_row}")
             self.btn_alterar.configure(state=tk.NORMAL)
             self.btn_excluir.configure(state=tk.NORMAL)
         else:
@@ -97,15 +95,23 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
     def excluir_tanque(self):
         if self.selected_row:
-            # Lógica para excluir o tanque
+            
             print(f"Excluir tanque: {self.selected_row}")
 
     def pesquisar(self):
         # Lógica para pesquisar e carregar os dados na grid
-        self.clear_frame()
-        cabecalhos = ["ID", "Nome", "Capacidade"]
         tanques = self.controladorTanqueCombustivel.listar_tanques()
-        self.criar_tabela(tanques, cabecalhos)
+        self.update_table(tanques)
+
+
+    def update_table(self, dados):
+        # Limpar a tabela atual
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        # Inserir novos dados na tabela
+        for index, row in enumerate(dados):
+            self.tree.insert('', 'end', values=row, tags=('evenrow' if index % 2 == 0 else 'oddrow'))
 
     def clear_frame(self):
         for widget in self.winfo_children():
@@ -119,11 +125,9 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         # Lógica para abrir a tela de cadastro de novo tanque
         print("Abrir tela de cadastro de novo tanque")
 
-
 if __name__ == '__main__':
-    ctk.set_appearance_mode("light")  # Define o modo de aparência para claro
     root = tk.Tk()
-    root.geometry("800x600")
+    root.geometry("1200x800")
     app = TelaTanqueCombustivel(root)
     app.pack(fill="both", expand=True)
     root.mainloop()

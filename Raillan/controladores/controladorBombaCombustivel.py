@@ -3,7 +3,7 @@ import sqlite3
 
 class ControladorBombaCombustivel:
     def __init__(self):
-        self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/gas-guardian/Raillan/dados/dadosTanqueCombustivel.sqlite')
+        self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
         self.__bomba = BombaCombustivel
         self.cursor.execute('''
