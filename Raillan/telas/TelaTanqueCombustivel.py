@@ -8,7 +8,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         super().__init__(parent)
         self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
         self.selected_row = None
-        self.cabecalhos = ["Nome", "Capacidade", "Combustível", "Status"]
+        self.cabecalhos = [ "Nome", "Capacidade", "Porcentagem Alerta", "Combustível", "Volume Atual"]
         self.tanques = self.controladorTanqueCombustivel.listar_tanques()
         self.tela_listar_tanques()
 
@@ -70,8 +70,8 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             self.tree.column(col, anchor="center")
 
         # Configurando as tags para cores alternadas
-        self.tree.tag_configure('evenrow', background='#E6E6E6')
-        self.tree.tag_configure('oddrow', background='#FFFFFF')
+        self.tree.tag_configure('evenrow', background='#242424')
+        self.tree.tag_configure('oddrow', background='#2D2E30')
 
         # Inserindo dados na tabela
         self.update_table(dados)
@@ -80,7 +80,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         selected_item = self.tree.selection()
         if selected_item:
             self.selected_row = self.tree.item(selected_item[0], "values")
-            print(f"Selecionado: {self.selected_row}")
             self.btn_alterar.configure(state=tk.NORMAL)
             self.btn_excluir.configure(state=tk.NORMAL)
         else:
@@ -90,19 +89,59 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
     def alterar_tanque(self):
         if self.selected_row:
-            # Lógica para alterar as informações do tanque
-            print(f"Alterar tanque: {self.selected_row}")
+            self.modal_alterar_tanque(self.selected_row)
+
+    def modal_alterar_tanque(self, dados_tanque):
+        self.modal = tk.Toplevel(self)
+        self.modal.title("Alterar Tanque")
+        self.modal.geometry("500x500")
+        
+        self.labels = ["Nome", "Capacidade", "Porcentagem Alerta", "Combustível", "Volume Atual"]
+        self.entries = {}
+        
+        for i, label in enumerate(self.labels):
+            lbl = ctk.CTkLabel(self.modal, text=label)
+            lbl.grid(row=i, column=0, padx=10, pady=5)
+            entry = ctk.CTkEntry(self.modal)
+            entry.grid(row=i, column=1, padx=10, pady=5)
+            if i == 0:
+                entry.insert(0, dados_tanque[i])
+                entry.configure(state='disabled')  # Desabilitar edição do identificador
+            else:
+                entry.insert(0, dados_tanque[i])
+            self.entries[label] = entry
+        
+        update_button = ctk.CTkButton(self.modal, text="Atualizar", command=self.atualizar_tanque)
+        update_button.grid(row=len(self.labels), columnspan=2, pady=20)
+
+    def atualizar_tanque(self):
+        nome = self.entries["Nome"].get()
+        capacidade = self.entries["Capacidade"].get()
+        porcentagem_alerta = self.entries["Porcentagem Alerta"].get()
+        combustivel = self.entries["Combustível"].get()
+        volume_atual = self.entries["Volume Atual"].get()
+        identificadorTanque = self.selected_row[5]
+        print(f"ID: {id}")
+
+        resultado = self.controladorTanqueCombustivel.atualizar_tanque(capacidade, porcentagem_alerta, combustivel, volume_atual, identificadorTanque)
+        if resultado:
+            print("Tanque atualizado com sucesso!")
+        else:
+            print("Erro ao atualizar o tanque.")
+        
+        self.modal.destroy()
 
     def excluir_tanque(self):
         if self.selected_row:
-            
-            print(f"Excluir tanque: {self.selected_row}")
+            self.controladorTanqueCombustivel.remover_tanque(self.selected_row[5])
+            self.pesquisar()
+            self.btn_alterar.configure(state=tk.DISABLED)
+            self.btn_excluir.configure(state=tk.DISABLED)
 
     def pesquisar(self):
         # Lógica para pesquisar e carregar os dados na grid
         tanques = self.controladorTanqueCombustivel.listar_tanques()
         self.update_table(tanques)
-
 
     def update_table(self, dados):
         # Limpar a tabela atual

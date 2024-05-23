@@ -19,3 +19,5 @@ cursor.executescript(sql_script)
 
 # Fechar a conexão
 conn.close()
+
+
