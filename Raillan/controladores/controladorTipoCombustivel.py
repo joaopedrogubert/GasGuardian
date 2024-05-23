@@ -3,7 +3,7 @@ from ..entidades.tipoCombustivel import TipoCombustivel
 
 class ControladorTipoCombustivel:
     def __init__(self):
-        self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/gas-guardian/Raillan/dados/dadosTanqueCombustivel.sqlite')
+        self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
         self.__tipoCombustivel = TipoCombustivel
         self.cursor.execute('''

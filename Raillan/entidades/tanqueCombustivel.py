@@ -1,11 +1,12 @@
 from entidades.tipoCombustivel import TipoCombustivel
 
 class TanqueCombustivel:
-    def __init__(self,capacidadeMaxima, porcentagemAlerta,tipoCombustivel,columeAtual):
+    def __init__(self,capacidadeMaxima, porcentagemAlerta,TipoCombustivel,volumeAtual, identificadorTanque):
+        self.__identificadorTanque = identificadorTanque
         self.__capacidadeMaxima = capacidadeMaxima
         self.__porcentagemAlerta = porcentagemAlerta
         self.__tipoCombustivel = TipoCombustivel #subistituir quando o paixao subir a branch para o objeto tipo de combustivel.
-        self.__volumeAtual = columeAtual
+        self.__volumeAtual = volumeAtual
 
     @property
     def capacidadeMaxima(self):
@@ -38,3 +39,7 @@ class TanqueCombustivel:
     @volumeAtual.setter
     def volumeAtual(self, value):
         self.__volumeAtual = value
+
+    @property
+    def identificadorTanque(self):
+        return self.__identificadorTanque
