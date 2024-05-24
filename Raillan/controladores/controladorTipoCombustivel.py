@@ -1,17 +1,12 @@
 import sqlite3
-from ..entidades.tipoCombustivel import TipoCombustivel
+from entidades.tipoCombustivel import TipoCombustivel
 
 class ControladorTipoCombustivel:
     def __init__(self):
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
         self.__tipoCombustivel = TipoCombustivel
-        self.cursor.execute('''
-        CREATE TABLE IF NOT EXISTS TipoCombustivel (
-            IdentificadorTipoCombustivel INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            preco NUMERIC NOT NULL)
-    ''')
+
 
     def adicionar_tipo_combustivel(self, id: int, nome: str, preco: float):
         tipoCombustivel = TipoCombustivel(id, nome, preco)
