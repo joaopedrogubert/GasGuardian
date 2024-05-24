@@ -45,7 +45,7 @@ class ControladorTanqueCombustivel:
     def listar_tanques(self):
         # Executar a consulta SQL para obter todos os tanques com o nome do combustível
         self.cursor.execute("""
-            SELECT t.id, t.nome, t.capacidadeMaxima, c.nome AS tipoCombustivel_id, t.volumeAtual
+            SELECT t.id, t.nome, t.porcentagemAlerta, t.capacidadeMaxima, c.nome AS tipoCombustivel_id, t.volumeAtual
             FROM Tanques t
             JOIN tipoCombustivel c ON t.tipoCombustivel_id = c.id
         """)
@@ -56,9 +56,9 @@ class ControladorTanqueCombustivel:
         # Adicionar o cálculo de Status para cada tanque
         tanques_atualizados = []
         for tanque in tanques:
-            id, nome, capacidade, combustivel, volume_atual = tanque
+            id, nome,porcentagemAlerta, capacidade, combustivel, volume_atual = tanque
             status = (volume_atual / capacidade) * 100 if capacidade else 0
-            tanque_atualizado = (nome, capacidade, combustivel, volume_atual, f"{status:.2f}%", id)
+            tanque_atualizado = (nome, porcentagemAlerta, capacidade, combustivel, volume_atual, status, id)
             tanques_atualizados.append(tanque_atualizado)
         
         return tanques_atualizados
@@ -77,8 +77,6 @@ class ControladorTanqueCombustivel:
     def atualizar_tanque(self, capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual, identificadorTanque):
         tanque = TanqueCombustivel(capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual, identificadorTanque)
 
-        if not isinstance(tanque, TanqueCombustivel):
-            raise ValueError("O objeto fornecido não é uma instância da classe TanqueCombustivel.")
         try:
             with self.conn:
                 update_query = "UPDATE Tanques SET"

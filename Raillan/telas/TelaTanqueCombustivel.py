@@ -8,7 +8,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         super().__init__(parent)
         self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
         self.selected_row = None
-        self.cabecalhos = [ "Nome", "Capacidade", "Porcentagem Alerta", "Combustível", "Volume Atual"]
+        self.cabecalhos = [ "Nome","Porcentagem Alerta", "Capacidade","Combustível", "Volume Atual", "Status"]
         self.tanques = self.controladorTanqueCombustivel.listar_tanques()
         self.tela_listar_tanques()
 
@@ -73,8 +73,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.tree.tag_configure('evenrow', background='#242424')
         self.tree.tag_configure('oddrow', background='#2D2E30')
 
-        # Inserindo dados na tabela
-        self.update_table(dados)
 
     def on_row_select(self, event):
         selected_item = self.tree.selection()
@@ -91,38 +89,61 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         if self.selected_row:
             self.modal_alterar_tanque(self.selected_row)
 
+
     def modal_alterar_tanque(self, dados_tanque):
         self.modal = tk.Toplevel(self)
         self.modal.title("Alterar Tanque")
-        self.modal.geometry("500x500")
-        
-        self.labels = ["Nome", "Capacidade", "Porcentagem Alerta", "Combustível", "Volume Atual"]
+
+        # Centralizar o modal na tela principal
+        self.modal.geometry("500x400")
+        self.modal.transient(self)
+        self.modal.grab_set()
+        self.modal.update_idletasks()
+
+        width = self.modal.winfo_width()
+        height = self.modal.winfo_height()
+        x = (self.modal.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.modal.winfo_screenheight() // 2) - (height // 2)
+        self.modal.geometry(f'{width}x{height}+{x}+{y}')
+
+        # Título alinhado à esquerda
+        title_label = ctk.CTkLabel(self.modal, text="Lista de Tanques", font=("Arial", 25, "bold"))
+        title_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky='w')
+
+        self.labels = ["Nome","Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
         self.entries = {}
-        
+
         for i, label in enumerate(self.labels):
             lbl = ctk.CTkLabel(self.modal, text=label)
-            lbl.grid(row=i, column=0, padx=10, pady=5)
-            entry = ctk.CTkEntry(self.modal)
-            entry.grid(row=i, column=1, padx=10, pady=5)
+            lbl.grid(row=i+1, column=0, padx=10, pady=5, sticky='e')
+            entry = ctk.CTkEntry(self.modal, width=120)
+            entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
             if i == 0:
                 entry.insert(0, dados_tanque[i])
                 entry.configure(state='disabled')  # Desabilitar edição do identificador
             else:
                 entry.insert(0, dados_tanque[i])
             self.entries[label] = entry
-        
-        update_button = ctk.CTkButton(self.modal, text="Atualizar", command=self.atualizar_tanque)
-        update_button.grid(row=len(self.labels), columnspan=2, pady=20)
 
+        # Botão Atualizar
+        update_button = ctk.CTkButton(self.modal, text="Atualizar", command=self.atualizar_tanque)
+        update_button.grid(row=len(self.labels)+1, column=0, columnspan=2, pady=20)
+
+        # Alinhar conteúdo ao centro
+        for i in range(len(self.labels) + 2):
+            self.modal.grid_rowconfigure(i, weight=1)
+        self.modal.grid_columnconfigure(0, weight=1)
+        self.modal.grid_columnconfigure(1, weight=1)
+
+
+            
     def atualizar_tanque(self):
         nome = self.entries["Nome"].get()
         capacidade = self.entries["Capacidade"].get()
         porcentagem_alerta = self.entries["Porcentagem Alerta"].get()
         combustivel = self.entries["Combustível"].get()
         volume_atual = self.entries["Volume Atual"].get()
-        identificadorTanque = self.selected_row[5]
-        print(f"ID: {id}")
-
+        identificadorTanque = self.selected_row[6]
         resultado = self.controladorTanqueCombustivel.atualizar_tanque(capacidade, porcentagem_alerta, combustivel, volume_atual, identificadorTanque)
         if resultado:
             print("Tanque atualizado com sucesso!")
@@ -141,15 +162,13 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
     def pesquisar(self):
         # Lógica para pesquisar e carregar os dados na grid
         tanques = self.controladorTanqueCombustivel.listar_tanques()
-        self.update_table(tanques)
-
-    def update_table(self, dados):
+        
         # Limpar a tabela atual
         for item in self.tree.get_children():
             self.tree.delete(item)
 
         # Inserir novos dados na tabela
-        for index, row in enumerate(dados):
+        for index, row in enumerate(tanques):
             self.tree.insert('', 'end', values=row, tags=('evenrow' if index % 2 == 0 else 'oddrow'))
 
     def clear_frame(self):
