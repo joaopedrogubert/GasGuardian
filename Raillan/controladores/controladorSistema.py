@@ -1,8 +1,9 @@
-from ..controladores.controladorPosto import ControladorPosto
-from ..controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
-from ..controladores.controladorAbastecimento import ControladorAbastecimento
-from ..controladores.controladorBombaCombustivel import ControladorBombaCombustivel
-from ..controladores.controladorTipoCombustivel import ControladorTipoCombustivel
+from controladores.controladorPosto import ControladorPosto
+from controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
+from controladores.controladorAbastecimento import ControladorAbastecimento
+from controladores.controladorBombaCombustivel import ControladorBombaCombustivel
+from controladores.controladorTipoCombustivel import ControladorTipoCombustivel
+
 
 
 class ControladorSistema:

@@ -1,4 +1,5 @@
 from controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
+from controladores.controladorTipoCombustivel import ControladorTipoCombustivel
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
@@ -9,6 +10,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
+        self.controladorTipoCombustivel = ControladorTipoCombustivel()
         self.selected_row = None
         self.cabecalhos = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
         self.tanques = self.controladorTanqueCombustivel.listar_tanques()
@@ -141,7 +143,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
             if i == 0:
                 entry.insert(0, dados_tanque[i])
-                entry.configure(state='disabled')  # Desabilitar edição do identificador
             else:
                 entry.insert(0, dados_tanque[i])
             self.entries[label] = entry
@@ -162,43 +163,47 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         porcentagem_alerta = self.entries["Porcentagem Alerta"].get().replace('%', '')  # Remover '%' e obter o número
         combustivel = self.entries["Combustível"].get()
         volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
-        status = self.entries["Status"].get().replace('%', '')  # Remover '%' e obter o número
-        identificadorTanque = self.selected_row[0]  # Ajustar o índice conforme necessário
+        identificadorTanque = self.selected_row[6]  # Ajustar o índice conforme necessário
+        print("id",identificadorTanque)
 
         # Converter os valores para os tipos apropriados antes de enviar para o banco
         try:
             capacidade = float(capacidade)
             porcentagem_alerta = float(porcentagem_alerta)
             volume_atual = float(volume_atual)
-            status = float(status)
-        except ValueError:
+        except ValueError as e:
             messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
             return
-
-        resultado = self.controladorTanqueCombustivel.atualizar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, status)
-        if resultado:
+        try:
+            resultado = self.controladorTanqueCombustivel.atualizar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, identificadorTanque)
             messagebox.showinfo("Sucesso", "Tanque atualizado com sucesso!", icon='info')
             self.modal.destroy()
             self.pesquisar()  # Atualizar a grid com os novos dados
-        else:
-            messagebox.showerror("Erro", "Erro ao atualizar o tanque.", icon='error')
+        except Exception as e:
+            print(e)
+            messagebox.showerror("Erro", f"Erro ao atualizar o tanque: {e}", icon='error')
 
     def excluir_tanque(self):
         if self.selected_row:
-            identificadorTanque = self.selected_row[0]  # Ajustar o índice conforme necessário
-            resultado = self.controladorTanqueCombustivel.remover_tanque(identificadorTanque)
-            if resultado:
+            identificadorTanque = self.selected_row[6]  # Ajustar o índice conforme necessário
+            try:
+                resultado = self.controladorTanqueCombustivel.remover_tanque(identificadorTanque)
                 messagebox.showinfo("Sucesso", "Tanque excluído com sucesso!", icon='info')
-                self.pesquisar()
-            else:
-                messagebox.showerror("Erro", "Erro ao excluir o tanque.", icon='error')
+                self.pesquisar()  # Atualizar a grid com os novos dados
+            except Exception as e:
+                messagebox.showerror("Erro", f"Erro ao excluir o tanque: {e}", icon='error')
+                print(e)
+                return
             self.btn_alterar.configure(state=tk.DISABLED)
             self.btn_excluir.configure(state=tk.DISABLED)
 
     def pesquisar(self):
         # Lógica para pesquisar e carregar os dados na grid
-        tanques = self.controladorTanqueCombustivel.listar_tanques()
-        
+        try:
+            tanques = self.controladorTanqueCombustivel.listar_tanques()
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao pesquisar os tanques: {e}", icon='error')
+            return
         # Limpar a tabela atual
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -238,17 +243,21 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         title_label = ctk.CTkLabel(self.modal, text="Cadastrar Novo Tanque", font=("Arial", 25, "bold"))
         title_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky='w')
 
-        self.labels = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
+        self.labels = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual"]
         self.entries = {}
+        combustiveis = self.controladorTipoCombustivel.listar_tipo_combustivel()
+        print(combustiveis)
 
-        for i, label in enumerate(self.labels):
+# Extrai apenas os nomes de todos os combustíveis
+        nomes_combustiveis = [combustivel[0] for combustivel in combustiveis]
+
+        for i, label in enumerate(self.labels): 
             lbl = ctk.CTkLabel(self.modal, text=label)
             lbl.grid(row=i+1, column=0, padx=10, pady=5, sticky='e')
 
             if label == "Combustível":
-                combustiveis = self.controladorTanqueCombustivel.controladorSistema.controladorTipoCombustivel.listar_tipo_combustivel()
                 self.combustivel_var = tk.StringVar()
-                entry = ttk.Combobox(self.modal, textvariable=self.combustivel_var, values=combustiveis)
+                entry = ttk.Combobox(self.modal, textvariable=self.combustivel_var, values=nomes_combustiveis)
                 entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
             else:
                 entry = ctk.CTkEntry(self.modal, width=120)
@@ -259,6 +268,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         # Botão Cadastrar
         cadastrar_button = ctk.CTkButton(self.modal, text="Cadastrar", command=self.salvar_novo_tanque)
         cadastrar_button.grid(row=len(self.labels)+1, column=0, columnspan=2, pady=20)
+
 
         # Alinhar conteúdo ao centro
         for i in range(len(self.labels) + 2):
@@ -272,25 +282,23 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         porcentagem_alerta = self.entries["Porcentagem Alerta"].get().replace('%', '')  # Remover '%' e obter o número
         combustivel = self.combustivel_var.get()
         volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
-        status = self.entries["Status"].get().replace('%', '')  # Remover '%' e obter o número
 
         # Converter os valores para os tipos apropriados antes de enviar para o banco
         try:
             capacidade = float(capacidade)
             porcentagem_alerta = float(porcentagem_alerta)
             volume_atual = float(volume_atual)
-            status = float(status)
         except ValueError:
             messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
             return
 
-        resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, status)
-        if resultado:
+        try:
+            resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual)
             messagebox.showinfo("Sucesso", "Novo tanque cadastrado com sucesso!", icon='info')
             self.modal.destroy()
             self.pesquisar()  # Atualizar a grid com os novos dados
-        else:
-            messagebox.showerror("Erro", "Erro ao cadastrar o novo tanque.", icon='error')
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao cadastrar o novo tanque: {e}", icon='error')
 
 
 

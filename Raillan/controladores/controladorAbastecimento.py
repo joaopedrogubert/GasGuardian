@@ -1,4 +1,4 @@
-from ..entidades.abastecimento import Abastecimento
+from entidades.abastecimento import Abastecimento
 import sqlite3
 
 class ControladorAbastecimento:

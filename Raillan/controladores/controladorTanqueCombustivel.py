@@ -1,13 +1,12 @@
 import sqlite3
 from entidades.tanqueCombustivel import TanqueCombustivel
-from controladores.controladorSistema import ControladorSistema
-    
 class ControladorTanqueCombustivel:
     def __init__(self):
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
-        self.__tanque = TanqueCombustivel()
-        self.controladorSistema = ControladorSistema()
+        self.__tanque = TanqueCombustivel
+        from controladores.controladorSistema import ControladorSistema
+        self.controladorSistema = ControladorSistema
 
         self.conn.commit()
 
@@ -64,17 +63,23 @@ class ControladorTanqueCombustivel:
     
     def remover_tanque(self, identificadorTanque):
         # Remover um tanque pelo Identificador
-        with self.conn:
-            self.cursor.execute("DELETE FROM Tanques WHERE id = ?", (identificadorTanque,))
-            return self.cursor.rowcount > 0
-        
-    def atualizar_tanque(self, capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual, identificadorTanque):
-        tanque = TanqueCombustivel(capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual, identificadorTanque)
+        try:
+            with self.conn:
+                self.cursor.execute("DELETE FROM Tanques WHERE id = ?", (identificadorTanque,))
+                return self.cursor.rowcount > 0
+        except sqlite3.Error as e:
+            print(f"Erro ao remover o tanque: {e}")
+            return e    
+    def atualizar_tanque(self,nome, capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual, identificadorTanque):
+        tanque = TanqueCombustivel(nome, capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual)
 
         try:
             with self.conn:
                 update_query = "UPDATE Tanques SET"
                 update_values = []
+                if tanque.nome is not None:
+                    update_query += " nome = ?,"
+                    update_values.append(tanque.nome)
                 if tanque.capacidadeMaxima is not None:
                     update_query += " capacidadeMaxima = ?,"
                     update_values.append(tanque.capacidadeMaxima)
@@ -88,7 +93,7 @@ class ControladorTanqueCombustivel:
                     update_query += " volumeAtual = ?,"
                     update_values.append(tanque.volumeAtual)
                 update_query = update_query.rstrip(",") + " WHERE id = ?"
-                update_values.append(tanque.identificadorTanque)
+                update_values.append(identificadorTanque)
                 print("Query montada:", update_query)
                 print("Valores:", update_values)
                 self.cursor.execute(update_query, update_values)

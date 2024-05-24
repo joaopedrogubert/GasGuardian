@@ -1,5 +1,5 @@
 import sqlite3
-from ..entidades.posto import PostoGasolina
+from entidades.posto import PostoGasolina
 
 class ControladorPosto:
     def __init__(self):

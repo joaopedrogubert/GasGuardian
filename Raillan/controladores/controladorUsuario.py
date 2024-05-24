@@ -1,4 +1,4 @@
-from ..entidades.usuario import Usuario
+from entidades.usuario import Usuario
 import sqlite3
 import hashlib
 
