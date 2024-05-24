@@ -1,37 +1,31 @@
 import sqlite3
 from entidades.tanqueCombustivel import TanqueCombustivel
-
+from controladores.controladorSistema import ControladorSistema
+    
 class ControladorTanqueCombustivel:
     def __init__(self):
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
-        self.__tanque = TanqueCombustivel
-        self.cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Tanques (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            capacidadeMaxima NUMERIC  NOT NULL,
-            porcentagemAlerta NUMERIC NOT NULL,
-            tipoCombustivel TEXT NOT NULL,
-            volumeAtual NUMERIC NOT NULL)
-    ''')
-        
+        self.__tanque = TanqueCombustivel()
+        self.controladorSistema = ControladorSistema()
+
         self.conn.commit()
 
     @property
     def novo_tanque(self):
         return self.__tanque
     
-    def adicionar_tanque(self, capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual):
+    def adicionar_tanque(self, nome, capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual):
 
-        novo_tanque = TanqueCombustivel(capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual)
+        novo_tanque = TanqueCombustivel(nome,capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual)
 
         if not isinstance(novo_tanque, TanqueCombustivel):
             raise ValueError("O objeto fornecido não é uma instância da classe TanqueCombustivel.")
 
         try:
             with self.conn:
-                self.cursor.execute("INSERT INTO Tanques (capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual) VALUES (?, ?, ?, ?)",
-                                    (novo_tanque.capacidadeMaxima, novo_tanque.porcentagemAlerta, novo_tanque.tipoCombustivel, novo_tanque.volumeAtual))
+                self.cursor.execute("INSERT INTO Tanques (nome, capacidadeMaxima, porcentagemAlerta, tipoCombustivel_nome, volumeAtual) VALUES (?, ?, ?, ?, ?)",
+                                    (novo_tanque.nome, novo_tanque.capacidadeMaxima, novo_tanque.porcentagemAlerta, novo_tanque.tipoCombustivel, novo_tanque.volumeAtual))
                 self.conn.commit()
         except sqlite3.IntegrityError as e:
             # Se houver uma violação de integridade (como chave duplicada), lança uma exceção
@@ -45,9 +39,9 @@ class ControladorTanqueCombustivel:
     def listar_tanques(self):
         # Executar a consulta SQL para obter todos os tanques com o nome do combustível
         self.cursor.execute("""
-            SELECT t.id, t.nome, t.porcentagemAlerta, t.capacidadeMaxima, c.nome AS tipoCombustivel_id, t.volumeAtual
+            SELECT t.id, t.nome, t.porcentagemAlerta, t.capacidadeMaxima, c.nome AS tipoCombustivel_nome, t.volumeAtual
             FROM Tanques t
-            JOIN tipoCombustivel c ON t.tipoCombustivel_id = c.id
+            JOIN tipoCombustivel c ON t.tipoCombustivel_nome = c.nome
         """)
         
         # Obter todos os dados
@@ -88,7 +82,7 @@ class ControladorTanqueCombustivel:
                     update_query += " porcentagemAlerta = ?,"
                     update_values.append(tanque.porcentagemAlerta)
                 if tanque.tipoCombustivel is not None:
-                    update_query += " tipoCombustivel_id = ?,"
+                    update_query += " tipoCombustivel_nome = ?,"
                     update_values.append(tanque.tipoCombustivel)
                 if tanque.volumeAtual is not None:
                     update_query += " volumeAtual = ?,"

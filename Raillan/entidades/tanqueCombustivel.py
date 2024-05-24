@@ -1,13 +1,23 @@
 from entidades.tipoCombustivel import TipoCombustivel
 
 class TanqueCombustivel:
-    def __init__(self,capacidadeMaxima, porcentagemAlerta,TipoCombustivel,volumeAtual, identificadorTanque):
-        self.__identificadorTanque = identificadorTanque
+    def __init__(self,nome, capacidadeMaxima, porcentagemAlerta,TipoCombustivel,volumeAtual ):
+        self.__nome = nome
+        self.__identificadorTanque = None
         self.__capacidadeMaxima = capacidadeMaxima
         self.__porcentagemAlerta = porcentagemAlerta
         self.__tipoCombustivel = TipoCombustivel #subistituir quando o paixao subir a branch para o objeto tipo de combustivel.
         self.__volumeAtual = volumeAtual
 
+    @property
+    def nome(self):
+        return self.__nome
+    
+    @nome.setter
+    def nome(self, value):
+        self.__nome = value
+
+    
     @property
     def capacidadeMaxima(self):
         return self.__capacidadeMaxima

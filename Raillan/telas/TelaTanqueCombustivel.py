@@ -2,13 +2,15 @@ from controladores.controladorTanqueCombustivel import ControladorTanqueCombusti
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
+
 
 class TelaTanqueCombustivel(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
         self.selected_row = None
-        self.cabecalhos = [ "Nome","Porcentagem Alerta", "Capacidade","Combustível", "Volume Atual", "Status"]
+        self.cabecalhos = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
         self.tanques = self.controladorTanqueCombustivel.listar_tanques()
         self.tela_listar_tanques()
 
@@ -41,7 +43,21 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         btn_pesquisar = ctk.CTkButton(self, text="Pesquisar", command=self.pesquisar)
         btn_pesquisar.pack(side="bottom", anchor="se", padx=10, pady=10)
 
+    def formatar_dados(self, dados):
+        dados_formatados = []
+        for linha in dados:
+            linha_formatada = list(linha)  # Converta a tupla em lista para ser editável
+            linha_formatada[1] = f"{linha_formatada[1]:.2f}%"  # Formate "Porcentagem Alerta"
+            linha_formatada[2] = f"{linha_formatada[2]:.2f} L"  # Formate "Capacidade"
+            linha_formatada[4] = f"{linha_formatada[4]:.2f} L"  # Formate "Volume Atual"
+            linha_formatada[5] = f"{linha_formatada[5]:.2f}%"  # Formate "Status"
+            dados_formatados.append(tuple(linha_formatada))  # Converta de volta para tupla
+        return dados_formatados
+
     def criar_tabela(self, dados, cabecalhos):
+        # Formatar dados antes de inseri-los no Treeview
+        dados_formatados = self.formatar_dados(dados)
+
         # Frame container para Treeview e Scrollbar com espaçamento
         container = ctk.CTkFrame(self)
         container.pack(fill="both", expand=True, padx=10, pady=20)
@@ -51,7 +67,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         scrollbar_y = ttk.Scrollbar(container, orient="vertical")
 
         self.tree = ttk.Treeview(container, columns=cabecalhos, show="headings", height=8,
-                                 xscrollcommand=scrollbar_x.set, yscrollcommand=scrollbar_y.set)
+                                xscrollcommand=scrollbar_x.set, yscrollcommand=scrollbar_y.set)
 
         scrollbar_x.pack(side="bottom", fill="x")
         scrollbar_y.pack(side="right", fill="y")
@@ -73,6 +89,12 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.tree.tag_configure('evenrow', background='#242424')
         self.tree.tag_configure('oddrow', background='#2D2E30')
 
+        # Inserindo os dados na Treeview com cores alternadas
+        for i, linha in enumerate(dados_formatados):
+            if i % 2 == 0:
+                self.tree.insert("", "end", values=linha, tags=('evenrow',))
+            else:
+                self.tree.insert("", "end", values=linha, tags=('oddrow',))
 
     def on_row_select(self, event):
         selected_item = self.tree.selection()
@@ -88,7 +110,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
     def alterar_tanque(self):
         if self.selected_row:
             self.modal_alterar_tanque(self.selected_row)
-
 
     def modal_alterar_tanque(self, dados_tanque):
         self.modal = tk.Toplevel(self)
@@ -107,10 +128,10 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.modal.geometry(f'{width}x{height}+{x}+{y}')
 
         # Título alinhado à esquerda
-        title_label = ctk.CTkLabel(self.modal, text="Lista de Tanques", font=("Arial", 25, "bold"))
+        title_label = ctk.CTkLabel(self.modal, text="Alterar Tanque", font=("Arial", 25, "bold"))
         title_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky='w')
 
-        self.labels = ["Nome","Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
+        self.labels = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
         self.entries = {}
 
         for i, label in enumerate(self.labels):
@@ -135,27 +156,42 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.modal.grid_columnconfigure(0, weight=1)
         self.modal.grid_columnconfigure(1, weight=1)
 
-
-            
     def atualizar_tanque(self):
         nome = self.entries["Nome"].get()
-        capacidade = self.entries["Capacidade"].get()
-        porcentagem_alerta = self.entries["Porcentagem Alerta"].get()
+        capacidade = self.entries["Capacidade"].get().replace(' L', '')  # Remover ' L' e obter o número
+        porcentagem_alerta = self.entries["Porcentagem Alerta"].get().replace('%', '')  # Remover '%' e obter o número
         combustivel = self.entries["Combustível"].get()
-        volume_atual = self.entries["Volume Atual"].get()
-        identificadorTanque = self.selected_row[6]
-        resultado = self.controladorTanqueCombustivel.atualizar_tanque(capacidade, porcentagem_alerta, combustivel, volume_atual, identificadorTanque)
+        volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
+        status = self.entries["Status"].get().replace('%', '')  # Remover '%' e obter o número
+        identificadorTanque = self.selected_row[0]  # Ajustar o índice conforme necessário
+
+        # Converter os valores para os tipos apropriados antes de enviar para o banco
+        try:
+            capacidade = float(capacidade)
+            porcentagem_alerta = float(porcentagem_alerta)
+            volume_atual = float(volume_atual)
+            status = float(status)
+        except ValueError:
+            messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
+            return
+
+        resultado = self.controladorTanqueCombustivel.atualizar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, status)
         if resultado:
-            print("Tanque atualizado com sucesso!")
+            messagebox.showinfo("Sucesso", "Tanque atualizado com sucesso!", icon='info')
+            self.modal.destroy()
+            self.pesquisar()  # Atualizar a grid com os novos dados
         else:
-            print("Erro ao atualizar o tanque.")
-        
-        self.modal.destroy()
+            messagebox.showerror("Erro", "Erro ao atualizar o tanque.", icon='error')
 
     def excluir_tanque(self):
         if self.selected_row:
-            self.controladorTanqueCombustivel.remover_tanque(self.selected_row[5])
-            self.pesquisar()
+            identificadorTanque = self.selected_row[0]  # Ajustar o índice conforme necessário
+            resultado = self.controladorTanqueCombustivel.remover_tanque(identificadorTanque)
+            if resultado:
+                messagebox.showinfo("Sucesso", "Tanque excluído com sucesso!", icon='info')
+                self.pesquisar()
+            else:
+                messagebox.showerror("Erro", "Erro ao excluir o tanque.", icon='error')
             self.btn_alterar.configure(state=tk.DISABLED)
             self.btn_excluir.configure(state=tk.DISABLED)
 
@@ -166,9 +202,9 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         # Limpar a tabela atual
         for item in self.tree.get_children():
             self.tree.delete(item)
-
+        dados = self.formatar_dados(tanques)
         # Inserir novos dados na tabela
-        for index, row in enumerate(tanques):
+        for index, row in enumerate(dados):
             self.tree.insert('', 'end', values=row, tags=('evenrow' if index % 2 == 0 else 'oddrow'))
 
     def clear_frame(self):
@@ -180,8 +216,84 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         pass
 
     def cadastrar_tanque(self):
-        # Lógica para abrir a tela de cadastro de novo tanque
-        print("Abrir tela de cadastro de novo tanque")
+        self.modal_cadastrar_tanque()
+
+    def modal_cadastrar_tanque(self):
+        self.modal = tk.Toplevel(self)
+        self.modal.title("Cadastrar Novo Tanque")
+
+        # Centralizar o modal na tela principal
+        self.modal.geometry("500x400")
+        self.modal.transient(self)
+        self.modal.grab_set()
+        self.modal.update_idletasks()
+
+        width = self.modal.winfo_width()
+        height = self.modal.winfo_height()
+        x = (self.modal.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.modal.winfo_screenheight() // 2) - (height // 2)
+        self.modal.geometry(f'{width}x{height}+{x}+{y}')
+
+        # Título alinhado à esquerda
+        title_label = ctk.CTkLabel(self.modal, text="Cadastrar Novo Tanque", font=("Arial", 25, "bold"))
+        title_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky='w')
+
+        self.labels = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
+        self.entries = {}
+
+        for i, label in enumerate(self.labels):
+            lbl = ctk.CTkLabel(self.modal, text=label)
+            lbl.grid(row=i+1, column=0, padx=10, pady=5, sticky='e')
+
+            if label == "Combustível":
+                combustiveis = self.controladorTanqueCombustivel.controladorSistema.controladorTipoCombustivel.listar_tipo_combustivel()
+                self.combustivel_var = tk.StringVar()
+                entry = ttk.Combobox(self.modal, textvariable=self.combustivel_var, values=combustiveis)
+                entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
+            else:
+                entry = ctk.CTkEntry(self.modal, width=120)
+                entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
+
+            self.entries[label] = entry
+
+        # Botão Cadastrar
+        cadastrar_button = ctk.CTkButton(self.modal, text="Cadastrar", command=self.salvar_novo_tanque)
+        cadastrar_button.grid(row=len(self.labels)+1, column=0, columnspan=2, pady=20)
+
+        # Alinhar conteúdo ao centro
+        for i in range(len(self.labels) + 2):
+            self.modal.grid_rowconfigure(i, weight=1)
+        self.modal.grid_columnconfigure(0, weight=1)
+        self.modal.grid_columnconfigure(1, weight=1)
+
+    def salvar_novo_tanque(self):
+        nome = self.entries["Nome"].get()
+        capacidade = self.entries["Capacidade"].get().replace(' L', '')  # Remover ' L' e obter o número
+        porcentagem_alerta = self.entries["Porcentagem Alerta"].get().replace('%', '')  # Remover '%' e obter o número
+        combustivel = self.combustivel_var.get()
+        volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
+        status = self.entries["Status"].get().replace('%', '')  # Remover '%' e obter o número
+
+        # Converter os valores para os tipos apropriados antes de enviar para o banco
+        try:
+            capacidade = float(capacidade)
+            porcentagem_alerta = float(porcentagem_alerta)
+            volume_atual = float(volume_atual)
+            status = float(status)
+        except ValueError:
+            messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
+            return
+
+        resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, status)
+        if resultado:
+            messagebox.showinfo("Sucesso", "Novo tanque cadastrado com sucesso!", icon='info')
+            self.modal.destroy()
+            self.pesquisar()  # Atualizar a grid com os novos dados
+        else:
+            messagebox.showerror("Erro", "Erro ao cadastrar o novo tanque.", icon='error')
+
+
+
 
 if __name__ == '__main__':
     root = tk.Tk()

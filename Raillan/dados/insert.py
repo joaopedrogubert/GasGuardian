@@ -15,9 +15,10 @@ with open(sql_file_path, 'r') as sql_file:
     sql_script = sql_file.read()
 
 # Executar o script SQL
-cursor.executescript(sql_script)
+cursor.executescript('DELETE FROM tanques WHERE id = 5')
 
 # Fechar a conexão
+
 conn.close()
 
 
