@@ -164,7 +164,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         combustivel = self.entries["Combustível"].get()
         volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
         identificadorTanque = self.selected_row[6]  # Ajustar o índice conforme necessário
-        print("id",identificadorTanque)
 
         # Converter os valores para os tipos apropriados antes de enviar para o banco
         try:
@@ -180,7 +179,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             self.modal.destroy()
             self.pesquisar()  # Atualizar a grid com os novos dados
         except Exception as e:
-            print(e)
             messagebox.showerror("Erro", f"Erro ao atualizar o tanque: {e}", icon='error')
 
     def excluir_tanque(self):
@@ -192,7 +190,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
                 self.pesquisar()  # Atualizar a grid com os novos dados
             except Exception as e:
                 messagebox.showerror("Erro", f"Erro ao excluir o tanque: {e}", icon='error')
-                print(e)
                 return
             self.btn_alterar.configure(state=tk.DISABLED)
             self.btn_excluir.configure(state=tk.DISABLED)
@@ -246,7 +243,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.labels = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual"]
         self.entries = {}
         combustiveis = self.controladorTipoCombustivel.listar_tipo_combustivel()
-        print(combustiveis)
 
 # Extrai apenas os nomes de todos os combustíveis
         nomes_combustiveis = [combustivel[0] for combustivel in combustiveis]
