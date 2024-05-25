@@ -50,7 +50,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         for linha in dados:
             linha_formatada = list(linha)  # Converta a tupla em lista para ser editável
             linha_formatada[1] = f"{linha_formatada[1]:.2f}%"  # Formate "Porcentagem Alerta"
-            linha_formatada[2] = f"{linha_formatada[2]:.2f} L"  # Formate "Capacidade"
+            linha_formatada[2] = f"{int(linha_formatada[2])} L"  # Formate "Capacidade"
             linha_formatada[4] = f"{linha_formatada[4]:.2f} L"  # Formate "Volume Atual"
             linha_formatada[5] = f"{linha_formatada[5]:.2f}%"  # Formate "Status"
             dados_formatados.append(tuple(linha_formatada))  # Converta de volta para tupla
@@ -173,6 +173,16 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         except ValueError as e:
             messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
             return
+        # Verificar se capacidade é maior que zero
+        if capacidade <= 0:
+            messagebox.showerror("Erro", "A capacidade deve ser maior que zero.", icon='error')
+            return
+
+        # Verificar se porcentagem_alerta é maior que 0 e menor que 100
+        if porcentagem_alerta <= 0 or porcentagem_alerta >= 100:
+            messagebox.showerror("Erro", "A porcentagem de alerta deve ser maior que 0 e menor que 100.", icon='error')
+            return
+        
         try:
             resultado = self.controladorTanqueCombustivel.atualizar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, identificadorTanque)
             messagebox.showinfo("Sucesso", "Tanque atualizado com sucesso!", icon='info')
@@ -287,7 +297,15 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         except ValueError:
             messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
             return
+        # Verificar se capacidade é maior que zero
+        if capacidade <= 0:
+            messagebox.showerror("Erro", "A capacidade deve ser maior que zero.", icon='error')
+            return
 
+        # Verificar se porcentagem_alerta é maior que 0 e menor que 100
+        if porcentagem_alerta <= 0 or porcentagem_alerta >= 100:
+            messagebox.showerror("Erro", "A porcentagem de alerta deve ser maior que 0 e menor que 100.", icon='error')
+            return
         try:
             resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual)
             messagebox.showinfo("Sucesso", "Novo tanque cadastrado com sucesso!", icon='info')

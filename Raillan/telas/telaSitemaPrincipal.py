@@ -48,7 +48,6 @@ class MenuPrincipal(ctk.CTk):
         # Adicionando itens ao menu
         icon_path_base = "/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/telas/Icones/"
         self.add_menu_item("", "abastecimento", "Abastecimento", icon_path_base + "afundando.png", True)
-
         # Adicionando item "Cadastro" com ícone
         cadastro_id = self.add_menu_item("", "cadastro", "Cadastro", icon_path_base + "cadastro.png", True)
         self.add_menu_item(cadastro_id, "funcionarios", "Funcionários", icon_path_base + "Funcionarios.png")
@@ -59,8 +58,8 @@ class MenuPrincipal(ctk.CTk):
         self.add_menu_item("", "relatorios", "Relatórios", icon_path_base + "relatorios.png", True)
 
         # Configuração das tags
-        self.tree_menu.tag_configure("main", font=("Arial", 30, "bold"), foreground="black")
-        self.tree_menu.tag_configure("sub", font=("Arial", 25, "bold"), foreground="black")
+        self.tree_menu.tag_configure("main", font=("Arial", 30, "bold"), foreground="white")
+        self.tree_menu.tag_configure("sub", font=("Arial", 25, "bold"), foreground="white")
 
         self.tree_menu.bind("<<TreeviewSelect>>", self.on_menu_select)
 
