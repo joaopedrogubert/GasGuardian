@@ -18,9 +18,6 @@ class ControladorTanqueCombustivel:
 
         novo_tanque = TanqueCombustivel(nome,capacidadeMaxima, porcentagemAlerta, tipoCombustivel, volumeAtual)
 
-        if not isinstance(novo_tanque, TanqueCombustivel):
-            raise ValueError("O objeto fornecido não é uma instância da classe TanqueCombustivel.")
-
         try:
             with self.conn:
                 self.cursor.execute("INSERT INTO Tanques (nome, capacidadeMaxima, porcentagemAlerta, tipoCombustivel_nome, volumeAtual) VALUES (?, ?, ?, ?, ?)",
@@ -107,8 +104,6 @@ class ControladorTanqueCombustivel:
         except sqlite3.Error as e:
             print(f"Erro ao atualizar o tanque: {e}")
             return False
-
-            
 
     def __del__(self):
         self.conn.close()

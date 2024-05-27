@@ -13,7 +13,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.controladorTipoCombustivel = ControladorTipoCombustivel()
         self.selected_row = None
         self.cabecalhos = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
-        self.tanques = self.controladorTanqueCombustivel.listar_tanques()
         self.tela_listar_tanques()
 
     def tela_listar_tanques(self):
@@ -37,9 +36,16 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
         self.btn_excluir = ctk.CTkButton(btn_frame, text="Excluir", command=self.excluir_tanque, state=tk.DISABLED)
         self.btn_excluir.pack(side="left", padx=5)
-
+        try:
+            tanques = self.controladorTanqueCombustivel.listar_tanques()
+            if not tanques:
+                messagebox.showinfo("Informação", "Nenhum tanque cadastrado.", icon='info')
+                return
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao listar os tanques: {e}", icon='error')
+            return
         # Criando a tabela responsiva com barra de rolagem horizontal
-        self.criar_tabela(self.tanques, self.cabecalhos)
+        self.criar_tabela(tanques, self.cabecalhos)
 
         # Adicionando botão de pesquisa na parte inferior direita
         btn_pesquisar = ctk.CTkButton(self, text="Pesquisar", command=self.pesquisar)
@@ -50,7 +56,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         for linha in dados:
             linha_formatada = list(linha)  # Converta a tupla em lista para ser editável
             linha_formatada[1] = f"{linha_formatada[1]:.2f}%"  # Formate "Porcentagem Alerta"
-            linha_formatada[2] = f"{linha_formatada[2]:.2f} L"  # Formate "Capacidade"
+            linha_formatada[2] = f"{int(linha_formatada[2])} L"  # Formate "Capacidade"
             linha_formatada[4] = f"{linha_formatada[4]:.2f} L"  # Formate "Volume Atual"
             linha_formatada[5] = f"{linha_formatada[5]:.2f}%"  # Formate "Status"
             dados_formatados.append(tuple(linha_formatada))  # Converta de volta para tupla
@@ -164,7 +170,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         combustivel = self.entries["Combustível"].get()
         volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
         identificadorTanque = self.selected_row[6]  # Ajustar o índice conforme necessário
-        print("id",identificadorTanque)
 
         # Converter os valores para os tipos apropriados antes de enviar para o banco
         try:
@@ -174,13 +179,22 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         except ValueError as e:
             messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
             return
+        # Verificar se capacidade é maior que zero
+        if capacidade <= 0:
+            messagebox.showerror("Erro", "A capacidade deve ser maior que zero.", icon='error')
+            return
+
+        # Verificar se porcentagem_alerta é maior que 0 e menor que 100
+        if porcentagem_alerta <= 0 or porcentagem_alerta >= 100:
+            messagebox.showerror("Erro", "A porcentagem de alerta deve ser maior que 0 e menor que 100.", icon='error')
+            return
+        
         try:
             resultado = self.controladorTanqueCombustivel.atualizar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, identificadorTanque)
             messagebox.showinfo("Sucesso", "Tanque atualizado com sucesso!", icon='info')
             self.modal.destroy()
             self.pesquisar()  # Atualizar a grid com os novos dados
         except Exception as e:
-            print(e)
             messagebox.showerror("Erro", f"Erro ao atualizar o tanque: {e}", icon='error')
 
     def excluir_tanque(self):
@@ -192,7 +206,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
                 self.pesquisar()  # Atualizar a grid com os novos dados
             except Exception as e:
                 messagebox.showerror("Erro", f"Erro ao excluir o tanque: {e}", icon='error')
-                print(e)
                 return
             self.btn_alterar.configure(state=tk.DISABLED)
             self.btn_excluir.configure(state=tk.DISABLED)
@@ -246,7 +259,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.labels = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual"]
         self.entries = {}
         combustiveis = self.controladorTipoCombustivel.listar_tipo_combustivel()
-        print(combustiveis)
 
 # Extrai apenas os nomes de todos os combustíveis
         nomes_combustiveis = [combustivel[0] for combustivel in combustiveis]
@@ -283,6 +295,9 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         combustivel = self.combustivel_var.get()
         volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
 
+        if not nome or not capacidade or not porcentagem_alerta or not combustivel or not volume_atual:
+            messagebox.showerror("Erro", "Todos os campos devem ser preenchidos!", icon='error')
+            return
         # Converter os valores para os tipos apropriados antes de enviar para o banco
         try:
             capacidade = float(capacidade)
@@ -291,7 +306,16 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         except ValueError:
             messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
             return
+        # Verificar se capacidade é maior que zero
+        if capacidade <= 0:
+            messagebox.showerror("Erro", "A capacidade deve ser maior que zero.", icon='error')
+            return
 
+        # Verificar se porcentagem_alerta é maior que 0 e menor que 100
+        if porcentagem_alerta <= 0 or porcentagem_alerta >= 100:
+            messagebox.showerror("Erro", "A porcentagem de alerta deve ser maior que 0 e menor que 100.", icon='error')
+            return
+        
         try:
             resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual)
             messagebox.showinfo("Sucesso", "Novo tanque cadastrado com sucesso!", icon='info')
