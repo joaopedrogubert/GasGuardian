@@ -13,7 +13,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.controladorTipoCombustivel = ControladorTipoCombustivel()
         self.selected_row = None
         self.cabecalhos = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
-        self.tanques = self.controladorTanqueCombustivel.listar_tanques()
         self.tela_listar_tanques()
 
     def tela_listar_tanques(self):
@@ -37,9 +36,16 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
         self.btn_excluir = ctk.CTkButton(btn_frame, text="Excluir", command=self.excluir_tanque, state=tk.DISABLED)
         self.btn_excluir.pack(side="left", padx=5)
-
+        try:
+            tanques = self.controladorTanqueCombustivel.listar_tanques()
+            if not tanques:
+                messagebox.showinfo("Informação", "Nenhum tanque cadastrado.", icon='info')
+                return
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao listar os tanques: {e}", icon='error')
+            return
         # Criando a tabela responsiva com barra de rolagem horizontal
-        self.criar_tabela(self.tanques, self.cabecalhos)
+        self.criar_tabela(tanques, self.cabecalhos)
 
         # Adicionando botão de pesquisa na parte inferior direita
         btn_pesquisar = ctk.CTkButton(self, text="Pesquisar", command=self.pesquisar)
@@ -289,6 +295,9 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         combustivel = self.combustivel_var.get()
         volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
 
+        if not nome or not capacidade or not porcentagem_alerta or not combustivel or not volume_atual:
+            messagebox.showerror("Erro", "Todos os campos devem ser preenchidos!", icon='error')
+            return
         # Converter os valores para os tipos apropriados antes de enviar para o banco
         try:
             capacidade = float(capacidade)
@@ -306,6 +315,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         if porcentagem_alerta <= 0 or porcentagem_alerta >= 100:
             messagebox.showerror("Erro", "A porcentagem de alerta deve ser maior que 0 e menor que 100.", icon='error')
             return
+        
         try:
             resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual)
             messagebox.showinfo("Sucesso", "Novo tanque cadastrado com sucesso!", icon='info')
