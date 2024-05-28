@@ -28,13 +28,13 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         btn_frame = ctk.CTkFrame(top_frame)
         btn_frame.pack(side="right")
 
-        btn_add = ctk.CTkButton(btn_frame, text="+", command=self.cadastrar_tanque)
+        btn_add = ctk.CTkButton(btn_frame, text="+", command=self.tela_cadastrar_tanque)
         btn_add.pack(side="left", padx=5)
 
-        self.btn_alterar = ctk.CTkButton(btn_frame, text="Alterar", command=self.alterar_tanque, state=tk.DISABLED)
+        self.btn_alterar = ctk.CTkButton(btn_frame, text="Alterar", command=self.tela_alterar_tanque, state=tk.DISABLED)
         self.btn_alterar.pack(side="left", padx=5)
 
-        self.btn_excluir = ctk.CTkButton(btn_frame, text="Excluir", command=self.excluir_tanque, state=tk.DISABLED)
+        self.btn_excluir = ctk.CTkButton(btn_frame, text="Excluir", command=self.tela_excluir_tanque, state=tk.DISABLED)
         self.btn_excluir.pack(side="left", padx=5)
         try:
             tanques = self.controladorTanqueCombustivel.listar_tanques()
@@ -51,7 +51,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         btn_pesquisar = ctk.CTkButton(self, text="Pesquisar", command=self.pesquisar)
         btn_pesquisar.pack(side="bottom", anchor="se", padx=10, pady=10)
 
-    def formatar_dados(self, dados):
+    def tela_formatar_dados(self, dados):
         dados_formatados = []
         for linha in dados:
             linha_formatada = list(linha)  # Converta a tupla em lista para ser editável
@@ -64,7 +64,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
 
     def criar_tabela(self, dados, cabecalhos):
         # Formatar dados antes de inseri-los no Treeview
-        dados_formatados = self.formatar_dados(dados)
+        dados_formatados = self.tela_formatar_dados(dados)
 
         # Frame container para Treeview e Scrollbar com espaçamento
         container = ctk.CTkFrame(self)
@@ -115,7 +115,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             self.btn_alterar.configure(state=tk.DISABLED)
             self.btn_excluir.configure(state=tk.DISABLED)
 
-    def alterar_tanque(self):
+    def tela_alterar_tanque(self):
         if self.selected_row:
             self.modal_alterar_tanque(self.selected_row)
 
@@ -154,7 +154,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             self.entries[label] = entry
 
         # Botão Atualizar
-        update_button = ctk.CTkButton(self.modal, text="Atualizar", command=self.atualizar_tanque)
+        update_button = ctk.CTkButton(self.modal, text="Atualizar", command=self.tela_atualizar_tanque)
         update_button.grid(row=len(self.labels)+1, column=0, columnspan=2, pady=20)
 
         # Alinhar conteúdo ao centro
@@ -163,7 +163,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.modal.grid_columnconfigure(0, weight=1)
         self.modal.grid_columnconfigure(1, weight=1)
 
-    def atualizar_tanque(self):
+    def tela_atualizar_tanque(self):
         nome = self.entries["Nome"].get()
         capacidade = self.entries["Capacidade"].get().replace(' L', '')  # Remover ' L' e obter o número
         porcentagem_alerta = self.entries["Porcentagem Alerta"].get().replace('%', '')  # Remover '%' e obter o número
@@ -197,7 +197,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao atualizar o tanque: {e}", icon='error')
 
-    def excluir_tanque(self):
+    def tela_excluir_tanque(self):
         if self.selected_row:
             identificadorTanque = self.selected_row[6]  # Ajustar o índice conforme necessário
             try:
@@ -220,7 +220,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         # Limpar a tabela atual
         for item in self.tree.get_children():
             self.tree.delete(item)
-        dados = self.formatar_dados(tanques)
+        dados = self.tela_formatar_dados(tanques)
         # Inserir novos dados na tabela
         for index, row in enumerate(dados):
             self.tree.insert('', 'end', values=row, tags=('evenrow' if index % 2 == 0 else 'oddrow'))
@@ -229,11 +229,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         for widget in self.winfo_children():
             widget.destroy()
 
-    def menu_principal(self):
-        # Implemente a lógica para voltar ao menu principal
-        pass
-
-    def cadastrar_tanque(self):
+    def tela_cadastrar_tanque(self):
         self.modal_cadastrar_tanque()
 
     def modal_cadastrar_tanque(self):

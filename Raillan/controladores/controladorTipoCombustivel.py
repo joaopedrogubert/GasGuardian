@@ -8,14 +8,14 @@ class ControladorTipoCombustivel:
         self.__tipoCombustivel = TipoCombustivel
 
 
-    def adicionar_tipo_combustivel(self, id: int, nome: str, preco: float):
-        tipoCombustivel = TipoCombustivel(id, nome, preco)
+    def adicionar_tipo_combustivel(self, nome: str, preco: float):
+        tipoCombustivel = TipoCombustivel(nome, preco)
         if not isinstance(tipoCombustivel, TipoCombustivel):
             raise ValueError("O objeto fornecido não é uma instância da classe TipoCombustivel.")
         try:
             with self.conn:
-                self.cursor.execute("INSERT INTO TipoCombustivel (IdentificadorTipoCombustivel, nome, preco) VALUES (?, ?, ?)",
-                                    (tipoCombustivel.id, tipoCombustivel.nome, tipoCombustivel.preco))
+                self.cursor.execute("INSERT INTO TipoCombustivel ( nome, preco) VALUES ( ?, ?)",
+                                    (tipoCombustivel.nome, tipoCombustivel.preco))
                 self.conn.commit()
 
         except sqlite3.IntegrityError as e:
@@ -44,8 +44,6 @@ class ControladorTipoCombustivel:
     
     def atualizar_tipo_combustivel(self, id: int, nome: str, preco: float):
         tipoCombustivel = TipoCombustivel(id, nome, preco)
-        if not isinstance(tipoCombustivel, TipoCombustivel):
-            raise ValueError("O objeto fornecido não é uma instância da classe TipoCombustivel.")
         try:
             with self.conn:
                 self.cursor.execute("UPDATE TipoCombustivel SET nome = ?, preco = ? WHERE IdentificadorTipoCombustivel = ?",

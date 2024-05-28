@@ -1,6 +1,5 @@
 class TipoCombustivel:
-    def __init__(self, id, nome, preco):
-        self.__id = id
+    def __init__(self, nome, preco):
         self.__nome = nome
         self.__preco = preco
 
