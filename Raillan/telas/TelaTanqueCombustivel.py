@@ -6,6 +6,12 @@ from tkinter import ttk
 from tkinter import messagebox
 
 
+def Mostra_mensagem(mensagem, tipo='erro'):
+    if tipo == 'erro':
+        messagebox.showerror("Erro", mensagem, icon='error')
+    elif tipo == 'info':
+        messagebox.showinfo("Informação", mensagem, icon='info')
+
 class TelaTanqueCombustivel(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -39,10 +45,10 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         try:
             tanques = self.controladorTanqueCombustivel.listar_tanques()
             if not tanques:
-                messagebox.showinfo("Informação", "Nenhum tanque cadastrado.", icon='info')
+                Mostra_mensagem("Nenhum tanque cadastrado.", tipo='info')
                 return
         except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao listar os tanques: {e}", icon='error')
+            Mostra_mensagem(f"Erro ao listar os tanques: {e}", tipo='erro')
             return
         # Criando a tabela responsiva com barra de rolagem horizontal
         self.criar_tabela(tanques, self.cabecalhos)
@@ -177,35 +183,35 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             porcentagem_alerta = float(porcentagem_alerta)
             volume_atual = float(volume_atual)
         except ValueError as e:
-            messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
+            Mostra_mensagem("Erro ao converter os valores para números.", tipo='erro')
             return
         # Verificar se capacidade é maior que zero
         if capacidade <= 0:
-            messagebox.showerror("Erro", "A capacidade deve ser maior que zero.", icon='error')
+            Mostra_mensagem("A capacidade deve ser maior que zero.", tipo='erro')
             return
 
         # Verificar se porcentagem_alerta é maior que 0 e menor que 100
         if porcentagem_alerta <= 0 or porcentagem_alerta >= 100:
-            messagebox.showerror("Erro", "A porcentagem de alerta deve ser maior que 0 e menor que 100.", icon='error')
+            Mostra_mensagem("A porcentagem de alerta deve ser maior que 0 e menor que 100.", tipo='erro')
             return
         
         try:
             resultado = self.controladorTanqueCombustivel.atualizar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual, identificadorTanque)
-            messagebox.showinfo("Sucesso", "Tanque atualizado com sucesso!", icon='info')
+            Mostra_mensagem("Tanque atualizado com sucesso!", tipo='info')
             self.modal.destroy()
             self.pesquisar()  # Atualizar a grid com os novos dados
         except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao atualizar o tanque: {e}", icon='error')
+            Mostra_mensagem(f"Erro ao atualizar o tanque: {e}", tipo='erro')
 
     def excluir_tanque(self):
         if self.selected_row:
             identificadorTanque = self.selected_row[6]  # Ajustar o índice conforme necessário
             try:
                 resultado = self.controladorTanqueCombustivel.remover_tanque(identificadorTanque)
-                messagebox.showinfo("Sucesso", "Tanque excluído com sucesso!", icon='info')
+                Mostra_mensagem("Tanque excluído com sucesso!", tipo='info')
                 self.pesquisar()  # Atualizar a grid com os novos dados
             except Exception as e:
-                messagebox.showerror("Erro", f"Erro ao excluir o tanque: {e}", icon='error')
+                Mostra_mensagem(f"Erro ao excluir o tanque: {e}", tipo='erro')
                 return
             self.btn_alterar.configure(state=tk.DISABLED)
             self.btn_excluir.configure(state=tk.DISABLED)
@@ -215,7 +221,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         try:
             tanques = self.controladorTanqueCombustivel.listar_tanques()
         except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao pesquisar os tanques: {e}", icon='error')
+            Mostra_mensagem(f"Erro ao pesquisar os tanques: {e}", tipo='erro')
             return
         # Limpar a tabela atual
         for item in self.tree.get_children():
@@ -260,10 +266,10 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.entries = {}
         combustiveis = self.controladorTipoCombustivel.listar_tipo_combustivel()
 
-# Extrai apenas os nomes de todos os combustíveis
+        # Extrai apenas os nomes de todos os combustíveis
         nomes_combustiveis = [combustivel[0] for combustivel in combustiveis]
 
-        for i, label in enumerate(self.labels): 
+        for i, label in enumerate(self.labels):
             lbl = ctk.CTkLabel(self.modal, text=label)
             lbl.grid(row=i+1, column=0, padx=10, pady=5, sticky='e')
 
@@ -281,7 +287,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         cadastrar_button = ctk.CTkButton(self.modal, text="Cadastrar", command=self.salvar_novo_tanque)
         cadastrar_button.grid(row=len(self.labels)+1, column=0, columnspan=2, pady=20)
 
-
         # Alinhar conteúdo ao centro
         for i in range(len(self.labels) + 2):
             self.modal.grid_rowconfigure(i, weight=1)
@@ -296,7 +301,7 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         volume_atual = self.entries["Volume Atual"].get().replace(' L', '')  # Remover ' L' e obter o número
 
         if not nome or not capacidade or not porcentagem_alerta or not combustivel or not volume_atual:
-            messagebox.showerror("Erro", "Todos os campos devem ser preenchidos!", icon='error')
+            Mostra_mensagem("Todos os campos devem ser preenchidos!", tipo='erro')
             return
         # Converter os valores para os tipos apropriados antes de enviar para o banco
         try:
@@ -304,28 +309,25 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             porcentagem_alerta = float(porcentagem_alerta)
             volume_atual = float(volume_atual)
         except ValueError:
-            messagebox.showerror("Erro", "Erro ao converter os valores para números.", icon='error')
+            Mostra_mensagem("Erro ao converter os valores para números.", tipo='erro')
             return
         # Verificar se capacidade é maior que zero
         if capacidade <= 0:
-            messagebox.showerror("Erro", "A capacidade deve ser maior que zero.", icon='error')
+            Mostra_mensagem("A capacidade deve ser maior que zero.", tipo='erro')
             return
 
         # Verificar se porcentagem_alerta é maior que 0 e menor que 100
         if porcentagem_alerta <= 0 or porcentagem_alerta >= 100:
-            messagebox.showerror("Erro", "A porcentagem de alerta deve ser maior que 0 e menor que 100.", icon='error')
+            Mostra_mensagem("A porcentagem de alerta deve ser maior que 0 e menor que 100.", tipo='erro')
             return
         
         try:
             resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual)
-            messagebox.showinfo("Sucesso", "Novo tanque cadastrado com sucesso!", icon='info')
+            Mostra_mensagem("Novo tanque cadastrado com sucesso!", tipo='info')
             self.modal.destroy()
             self.pesquisar()  # Atualizar a grid com os novos dados
         except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao cadastrar o novo tanque: {e}", icon='error')
-
-
-
+            Mostra_mensagem(f"Erro ao cadastrar o novo tanque: {e}", tipo='erro')
 
 if __name__ == '__main__':
     root = tk.Tk()
