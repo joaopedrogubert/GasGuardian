@@ -5,9 +5,6 @@ class ControladorTanqueCombustivel:
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
         self.__tanque = TanqueCombustivel
-        from controladores.controladorSistema import ControladorSistema
-        self.controladorSistema = ControladorSistema
-
         self.conn.commit()
 
     @property
