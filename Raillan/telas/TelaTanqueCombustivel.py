@@ -129,7 +129,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.modal = tk.Toplevel(self)
         self.modal.title("Alterar Tanque")
 
-        # Centralizar o modal na tela principal
         self.modal.geometry("500x400")
         self.modal.transient(self)
         self.modal.grab_set()
@@ -141,29 +140,33 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         y = (self.modal.winfo_screenheight() // 2) - (height // 2)
         self.modal.geometry(f'{width}x{height}+{x}+{y}')
 
-        # Título alinhado à esquerda
         title_label = ctk.CTkLabel(self.modal, text="Alterar Tanque", font=("Arial", 25, "bold"))
         title_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky='w')
 
         self.labels = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
         self.entries = {}
 
+        combustiveis = self.controladorTipoCombustivel.listar_tipo_combustivel()
+        nomes_combustiveis = [combustivel[0] for combustivel in combustiveis]
+
         for i, label in enumerate(self.labels):
             lbl = ctk.CTkLabel(self.modal, text=label)
             lbl.grid(row=i+1, column=0, padx=10, pady=5, sticky='e')
-            entry = ctk.CTkEntry(self.modal, width=120)
-            entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
-            if i == 0:
-                entry.insert(0, dados_tanque[i])
+            
+            if label == "Combustível":
+                self.combustivel_var = tk.StringVar(value=dados_tanque[i])
+                entry = ttk.Combobox(self.modal, textvariable=self.combustivel_var, values=nomes_combustiveis)
+                entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
             else:
+                entry = ctk.CTkEntry(self.modal, width=120)
                 entry.insert(0, dados_tanque[i])
+                entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
+            
             self.entries[label] = entry
 
-        # Botão Atualizar
         update_button = ctk.CTkButton(self.modal, text="Atualizar", command=self.tela_atualizar_tanque)
         update_button.grid(row=len(self.labels)+1, column=0, columnspan=2, pady=20)
 
-        # Alinhar conteúdo ao centro
         for i in range(len(self.labels) + 2):
             self.modal.grid_rowconfigure(i, weight=1)
         self.modal.grid_columnconfigure(0, weight=1)

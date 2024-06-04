@@ -1,24 +1,53 @@
 import sqlite3
 
-# Caminho do banco de dados
+class SQLiteExecutor:
+    def __init__(self, db_path):
+        self.db_path = db_path
+
+    def execute(self, command):
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute(command)
+            conn.commit()
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Erro ao executar o comando SQL: {e}")
+            return None
+        finally:
+            conn.close()
+
+    def executescript(self, script):
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.executescript(script)
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"Erro ao executar o script SQL: {e}")
+        finally:
+            conn.close()
+
+# Exemplo de uso
 db_path = '/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite'
+executor = SQLiteExecutor(db_path)
 
-# Caminho do arquivo SQL
-sql_file_path = '/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/create_and_insert_data.sql'
+# Executar um comando SQL
+result = executor.execute("SELECT * FROM Bombas;")
+print(result)
 
-# Conectar ao banco de dados SQLite
-conn = sqlite3.connect(db_path)
-cursor = conn.cursor()
+# Executar um script SQL
+sql_script = '''
+CREATE TABLE IF NOT EXISTS Bombasx (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    autoAbastecimento BOOLEAN NOT NULL,
+    tipoCombustivel_nome TEXT NOT NULL,
+    bombaAtiva BOOLEAN NOT NULL,
+    tanque_id INTEGER NOT NULL,
+    nomeBomba TEXT NOT NULL,
+    FOREIGN KEY (tanque_id) REFERENCES Tanques (id),
+    FOREIGN KEY (tipoCombustivel_nome) REFERENCES TipoCombustivel (nome)
+);
+'''
 
-# Ler o conteúdo do script SQL
-with open(sql_file_path, 'r') as sql_file:
-    sql_script = sql_file.read()
-
-# Executar o script SQL
-cursor.executescript('DELETE FROM tanques WHERE id = 5')
-
-# Fechar a conexão
-
-conn.close()
-
-
+executor.executescript(sql_script)

@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 import os
 
 from TelaTanqueCombustivel import TelaTanqueCombustivel  # Importação da classe TelaTanqueCombustivel
+from telaBombaCombustivel import TelaBombaCombustivel  # Importação da classe TelaBombaCombustivel
 
 class MenuPrincipal(ctk.CTk):
     def __init__(self):
@@ -66,6 +67,7 @@ class MenuPrincipal(ctk.CTk):
     def create_frames(self):
         # Adicionar os frames que você deseja exibir ao clicar nos submenus
         self.frames["tanques"] = TelaTanqueCombustivel(self)
+        self.frames["bombas"] = TelaBombaCombustivel(self)
 
         for frame in self.frames.values():
             frame.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
