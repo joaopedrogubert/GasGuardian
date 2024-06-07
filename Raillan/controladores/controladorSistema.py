@@ -10,11 +10,11 @@ from telas.telaSitemaPrincipal import MenuPrincipal
 class ControladorSistema:
     def __init__(self) -> None:
         self.__TelaPrincipal = MenuPrincipal()
-        self.__controladorPosto = ControladorPosto(self)
-        self.__controladorTanqueCombustivel = ControladorTanqueCombustivel(self)
-        self.__controladorAbastecimento = ControladorAbastecimento(self)
-        self.__controladorBombaCombustivel = ControladorBombaCombustivel(self)
-        self.__controladorTipoCombustivel = ControladorTipoCombustivel(self)
+        self.__controladorPosto = ControladorPosto()
+        self.__controladorTanqueCombustivel = ControladorTanqueCombustivel()
+        self.__controladorAbastecimento = ControladorAbastecimento()
+        self.__controladorBombaCombustivel = ControladorBombaCombustivel()
+        self.__controladorTipoCombustivel = ControladorTipoCombustivel()
 
     @property
     def controladorPosto(self):
@@ -35,3 +35,9 @@ class ControladorSistema:
     @property
     def controladorTipoCombustivel(self):
         return self.__controladorTipoCombustivel
+    @property
+    def TelaPrincipal(self):
+        return self.__TelaPrincipal
+    
+    def abre_tela_principal(self):
+        self.__TelaPrincipal.mainloop()
