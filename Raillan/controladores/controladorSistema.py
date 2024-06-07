@@ -3,11 +3,13 @@ from controladores.controladorTanqueCombustivel import ControladorTanqueCombusti
 from controladores.controladorAbastecimento import ControladorAbastecimento
 from controladores.controladorBombaCombustivel import ControladorBombaCombustivel
 from controladores.controladorTipoCombustivel import ControladorTipoCombustivel
+from telas.telaSitemaPrincipal import MenuPrincipal
 
 
 
 class ControladorSistema:
     def __init__(self) -> None:
+        self.__TelaPrincipal = MenuPrincipal()
         self.__controladorPosto = ControladorPosto(self)
         self.__controladorTanqueCombustivel = ControladorTanqueCombustivel(self)
         self.__controladorAbastecimento = ControladorAbastecimento(self)

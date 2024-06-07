@@ -4,8 +4,8 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import os
 
-from TelaTanqueCombustivel import TelaTanqueCombustivel  # Importação da classe TelaTanqueCombustivel
-from telaBombaCombustivel import TelaBombaCombustivel  # Importação da classe TelaBombaCombustivel
+from .TelaTanqueCombustivel import TelaTanqueCombustivel  # Importação da classe TelaTanqueCombustivel
+from .telaBombaCombustivel import TelaBombaCombustivel  # Importação da classe TelaBombaCombustivel
 
 class MenuPrincipal(ctk.CTk):
     def __init__(self):
@@ -109,6 +109,6 @@ class MenuPrincipal(ctk.CTk):
             self.current_frame = frame
 
 if __name__ == '__main__':
-    ctk.set_appearance_mode("system")
+    ctk.set_appearance_mode("dark")
     app = MenuPrincipal()
     app.mainloop()

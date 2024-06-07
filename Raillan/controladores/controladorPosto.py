@@ -7,12 +7,6 @@ class ControladorPosto:
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
         self.__posto = PostoGasolina
-        self.cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Postos (
-            cnpj TEXT PRIMARY KEY,
-            chavePix TEXT UNIQUE,
-            nomePosto TEXT NOT NULL)
-    ''')
         self.conn.commit()
 
     @property
@@ -74,6 +68,3 @@ class ControladorPosto:
             print(f"Erro ao atualizar o posto: {e}")
             return False
 
-    def __del__(self):
-        # Fechar a conexão com o banco de dados
-        return self.conn.close()
