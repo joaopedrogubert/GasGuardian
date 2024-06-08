@@ -1,5 +1,6 @@
-from ..controladores.controladorPosto import ControladorPosto
+from controladores.controladorPosto import ControladorPosto
 import customtkinter as ctk
+import tkinter as tk
 
 class TelaPosto(ctk.CTk):
     def __init__(self):
@@ -127,5 +128,8 @@ class TelaPosto(ctk.CTk):
         self.after(3000, self.menu_principal)
 
 if __name__ == '__main__':
-    app = TelaPosto()
-    app.mainloop()
+    root = tk.Tk()
+    root.geometry("1200x800")
+    app = TelaPosto(root)
+    app.pack(fill="both", expand=True)
+    root.mainloop()

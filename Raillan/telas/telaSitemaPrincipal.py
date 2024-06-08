@@ -6,6 +6,7 @@ import os
 
 from .TelaTanqueCombustivel import TelaTanqueCombustivel  # Importação da classe TelaTanqueCombustivel
 from .telaBombaCombustivel import TelaBombaCombustivel  # Importação da classe TelaBombaCombustivel
+from .TelaPosto import TelaPosto  # Importação da classe TelaPosto
 
 class MenuPrincipal(ctk.CTk):
     def __init__(self):
@@ -55,6 +56,7 @@ class MenuPrincipal(ctk.CTk):
         self.add_menu_item(cadastro_id, "tanques", "Tanques", icon_path_base + "tanquesCombustivel.png")
         self.add_menu_item(cadastro_id, "combustiveis", "Combustíveis", icon_path_base + "oil.png")
         self.add_menu_item(cadastro_id, "bombas", "Bombas", icon_path_base + "bomba-de-gasolina.png")
+        self.add_menu_item(cadastro_id, "posto", "Posto", icon_path_base + "posto.png")
 
         self.add_menu_item("", "relatorios", "Relatórios", icon_path_base + "relatorios.png", True)
 
