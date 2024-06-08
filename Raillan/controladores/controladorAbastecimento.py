@@ -6,16 +6,6 @@ class ControladorAbastecimento:
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
         self.__abastecimento = Abastecimento
-        self.cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Abastecimentos (
-            IdentificadorAbastecimento INTEGER PRIMARY KEY AUTOINCREMENT,
-            IdentificadorBomba INTEGER NOT NULL ,
-            data TEXT NOT NULL,
-            litros REAL NOT NULL,
-            valorTotal REAL NOT NULL,
-            FOREIGN KEY (IdentificadorBomba) REFERENCES Bombas(IdentificadorBomba))
-    ''')
-            
         self.conn.commit()
         
     @property
