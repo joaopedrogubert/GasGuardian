@@ -19,9 +19,9 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
         self.controladorTipoCombustivel = ControladorTipoCombustivel()
         self.selected_row = None
         self.cabecalhos = ["Nome", "Porcentagem Alerta", "Capacidade", "Combustível", "Volume Atual", "Status"]
-        self.tela_listar_tanques()
+        self.criar_tela_tanque_Combustivel()
 
-    def tela_listar_tanques(self):
+    def criar_tela_tanque_Combustivel(self):
         self.clear_frame()
 
         top_frame = ctk.CTkFrame(self)
@@ -320,8 +320,6 @@ class TelaTanqueCombustivel(ctk.CTkFrame):
             Mostra_mensagem("A capacidade deve ser maior que zero.", tipo='erro')
             return
 
-
-        
         try:
             resultado = self.controladorTanqueCombustivel.adicionar_tanque(nome, capacidade, porcentagem_alerta, combustivel, volume_atual)
             Mostra_mensagem("Novo tanque cadastrado com sucesso!", tipo='info')

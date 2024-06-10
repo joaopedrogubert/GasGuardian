@@ -70,6 +70,7 @@ class MenuPrincipal(ctk.CTk):
         # Adicionar os frames que você deseja exibir ao clicar nos submenus
         self.frames["tanques"] = TelaTanqueCombustivel(self)
         self.frames["bombas"] = TelaBombaCombustivel(self)
+        self.frames["posto"] = TelaPosto(self)
 
         for frame in self.frames.values():
             frame.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
