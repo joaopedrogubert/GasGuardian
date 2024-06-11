@@ -1,79 +1,56 @@
-from entidades.abastecimento import Abastecimento
 import sqlite3
+from entidades.abastecimento import Abastecimento
+from controladores.controladorBombaCombustivel import ControladorBombaCombustivel
+from controladores.controladorTipoCombustivel import ControladorTipoCombustivel
+from controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
+from datetime import datetime
 
 class ControladorAbastecimento:
     def __init__(self):
+        self.controlador_bomba = ControladorBombaCombustivel()
+        self.controlador_tipo_combustivel = ControladorTipoCombustivel()
+        self.controlador_tanque_combustivel = ControladorTanqueCombustivel()
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
-        self.__abastecimento = Abastecimento
         self.conn.commit()
-        
-    @property
-    def novo_abastecimento(self):
-        return self.__abastecimento
-    
+
+    def verificar_abastecimento(self, idBomba, tipoCombustivel, preco, litros):
+        # Verificar se a bomba está ativa
+        bomba = self.controlador_bomba.buscar_bomba(idBomba)
+        print(bomba)
+        if not bomba or not bomba[3]:
+            raise Exception("A bomba selecionada não está ativa.")
+
+
+        # Verificar se o tanque tem capacidade para o abastecimento
+        tanque = self.controlador_tanque_combustivel.buscar_tanque(bomba[5])
+        print(tanque)
+        if not tanque or tanque[4] < litros:
+            raise Exception("O tanque não tem capacidade suficiente para o abastecimento solicitado.")
+
+        return True
+
     def adicionar_abastecimento(self, idBomba, tipoCombustivel, data, preco, litros):
-        novo_abastecimento = Abastecimento(idBomba, tipoCombustivel, data, preco, litros)
-        if not isinstance(novo_abastecimento, Abastecimento):
-            raise ValueError("O objeto fornecido não é uma instância da classe Abastecimento.")
+        # Verificar dados do abastecimento
+        self.verificar_abastecimento(idBomba, tipoCombustivel, float(preco), float(litros))
+        
+        # Criar objeto Abastecimento
+        abastecimento = Abastecimento(idBomba, tipoCombustivel, data, float(preco), float(litros))
+        
+        # Atualizar a capacidade do tanque
+        bomba = self.controlador_bomba.buscar_bomba(idBomba)
+        tanque = self.controlador_tanque_combustivel.buscar_tanque(bomba[5])
+        if tanque:
+            self.controlador_tanque_combustivel.atualizar_volume_tanque(tanque[0], abastecimento.litros)
+        
+        # Adicionar o abastecimento ao banco
         try:
             with self.conn:
-                self.cursor.execute("INSERT INTO Abastecimentos (idBomba, data, litros, preco, tipoCombustivel) VALUES (?, ?, ?, ?,?)",
-                                    (novo_abastecimento.idBomba, novo_abastecimento.data, novo_abastecimento.litros, novo_abastecimento.preco, novo_abastecimento.tipoCombustivel))
+                self.cursor.execute(
+                    "INSERT INTO Abastecimentos (idBomba, data, litros, Preco, tipoCombustivel) VALUES (?, ?, ?, ?, ?)",
+                    (abastecimento.idBomba, abastecimento.data, abastecimento.litros, abastecimento.preco, abastecimento.tipoCombustivel)
+                )
                 self.conn.commit()
         except sqlite3.IntegrityError as e:
-            print(e)
-            # Se houver uma violação de integridade (como chave duplicada), lança uma exceção
-            if 'FOREIGN KEY constraint failed' in str(e):
-                raise ValueError("Erro: Bomba não cadastrada.")
-            else:
-                raise
-
-    def listar_abastecimentos(self):
-        # Listar todos os abastecimentos do banco de dados
-        self.cursor.execute("SELECT * FROM Abastecimentos")
-        return self.cursor.fetchall()
-    
-    def buscar_abastecimento(self, identificadorAbastecimento):
-        # Buscar um abastecimento específico pelo Identificador
-        self.cursor.execute("SELECT * FROM Abastecimentos WHERE IdentificadorAbastecimento = ?", (identificadorAbastecimento,))
-        return self.cursor.fetchone()
-    
-    def remover_abastecimento(self, identificadorAbastecimento):
-        # Remover um abastecimento pelo Identificador
-        with self.conn:
-            self.cursor.execute("DELETE FROM Abastecimentos WHERE IdentificadorAbastecimento = ?", (identificadorAbastecimento,))
-            return self.cursor.rowcount > 0
-        
-    def atualizar_abastecimento(self, identificadorAbastecimento, idBomba, data, litros, preco, tipoCombustivel):
-        novo_abastecimento = Abastecimento(idBomba, data, litros, preco, tipoCombustivel)
-        if not isinstance(novo_abastecimento, Abastecimento):
-            raise ValueError("O objeto fornecido não é uma instância da classe Abastecimento.")
-        try:
-            with self.conn:
-                self.cursor.execute("UPDATE Abastecimentos SET idBomba = ?, data = ?, litros = ?, preco, tipoCombustivel = ? WHERE IdentificadorAbastecimento = ?",
-                                    (novo_abastecimento.idBomba, novo_abastecimento.data, novo_abastecimento.litros, novo_abastecimento.preco, tipoCombustivel, novo_abastecimento.tipoCombustivel , identificadorAbastecimento))
-                self.conn.commit()
-        except sqlite3.IntegrityError as e:
-            # Se houver uma violação de integridade (como chave duplicada), lança uma exceção
-            if 'FOREIGN KEY constraint failed' in str(e):
-                raise ValueError("Erro: Bomba não cadastrada.")
-            else:
-                raise
-
-    @property
-    def novo_abastecimento(self):
-        return self.__abastecimento
-    
-    @novo_abastecimento.setter
-    def novo_abastecimento(self, value):
-        self.__abastecimento = value
-
-    def __del__(self):
-        self.conn.close()
-
-        
-
-
-
-
+            raise ValueError(f"Erro ao registrar Abastecimento: {e}")
+        return True
