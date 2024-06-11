@@ -55,6 +55,41 @@ class ControladorTanqueCombustivel:
         self.cursor.execute("SELECT * FROM Tanques WHERE id = ?", (identificadorTanque,))
         return self.cursor.fetchone()
     
+    def buscar_volume_atual_tanque(self, identificadorTanque):
+        # Buscar o volume atual de um tanque específico pelo Identificador
+        self.cursor.execute("SELECT volumeAtual FROM Tanques WHERE id = ?", (identificadorTanque,))
+        return self.cursor.fetchone()
+
+    def atualizar_volume_tanque(self, identificador_tanque, litros):
+        try:
+            # Obter o volume atual do tanque
+            self.cursor.execute("SELECT volumeAtual FROM Tanques WHERE id = ?", (identificador_tanque,))
+            resultado = self.cursor.fetchone()
+            
+            if resultado:
+                volume_atual = resultado[0]
+                novo_volume = volume_atual - litros
+                
+                # Atualizar o volume do tanque
+                with self.conn:
+                    self.cursor.execute("UPDATE Tanques SET volumeAtual = ? WHERE id = ?", (novo_volume, identificador_tanque))
+                    self.conn.commit()
+                    
+                    if self.cursor.rowcount > 0:
+                        print("Tanque atualizado com sucesso!")
+                        return True
+                    else:
+                        print("Nenhum tanque encontrado com o identificador fornecido.")
+                        return False
+            else:
+                print("Nenhum tanque encontrado com o identificador fornecido.")
+                return False
+                
+        except sqlite3.Error as e:
+            print(f"Erro ao atualizar o tanque: {e}")
+            return False
+
+        
     def remover_tanque(self, identificadorTanque):
         # Remover um tanque pelo Identificador
         try:
