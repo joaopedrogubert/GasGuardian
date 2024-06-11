@@ -129,13 +129,12 @@ class TelaAbastecimento(tk.Frame):
 
 
     def salvar_abastecimento(self):
-        nomeBomba = self.entries["Bomba"].get()
+        nomeBomba = self.bomba_var.get()
         idBomba = dados_bomba[nomeBomba]
-        print(idBomba)
         tipoCombustivel = self.combustivel_var.get()
         data = datetime.now()
         data_formatada = data.strftime("%Y-%m-%d %H:%M:%S")
-        preco = self.entries["Preço"].get()
+        preco = self.preco_var.get()
         litros = self.entries["Litros abastecidos"].get()
 
         if not nomeBomba or not tipoCombustivel or not preco:
@@ -143,12 +142,12 @@ class TelaAbastecimento(tk.Frame):
             return
 
         try:
-            print(idBomba, tipoCombustivel, data_formatada, preco, litros)
-            resultado = self.controladorAbastecimento.adicionar_abastecimento(idBomba, tipoCombustivel, data_formatada, preco, litros)
+            self.controladorAbastecimento.adicionar_abastecimento(idBomba, tipoCombustivel, data_formatada, preco, litros)
             self.mostra_mensagem("Abastecimento registrado com sucesso!", tipo='info')
             self.modal.destroy()
         except Exception as e:
             self.mostra_mensagem(f"Erro ao registrar abastecimento: {e}", tipo='erro')
+
 
     def centralize_modal(self, window, width, height):
         screen_width = window.winfo_screenwidth()

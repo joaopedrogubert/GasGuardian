@@ -2,11 +2,13 @@ import sqlite3
 from entidades.tipoCombustivel import TipoCombustivel
 from entidades.tanqueCombustivel import TanqueCombustivel
 from entidades.bombaCombustivel import BombaCombustivel
+from controladores.controladorTanqueCombustivel import ControladorTanqueCombustivel
 
 class ControladorBombaCombustivel:
     def __init__(self):
         self.conn = sqlite3.connect('/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/dados/DADOS.sqlite')
         self.cursor = self.conn.cursor()
+        self.controladorTanqueCombustivel = ControladorTanqueCombustivel()
         self.conn.commit()
 
     def adicionar_bomba(self, autoAbastecimento, tipoCombustivel, bombaAtiva, tanque, nomeBomba):
@@ -20,7 +22,6 @@ class ControladorBombaCombustivel:
                 self.conn.commit()
         except sqlite3.IntegrityError as e:
             raise ValueError(f"Erro ao adicionar bomba: {e}")
-
     def listar_bombas(self):
         self.cursor.execute("""
             SELECT b.id, b.autoAbastecimento, b.tipoCombustivel_nome, b.bombaAtiva, t.nome AS tanque_nome, b.nomeBomba
@@ -28,7 +29,6 @@ class ControladorBombaCombustivel:
             JOIN Tanques t ON b.tanque_id = t.id
         """)
         bombas = self.cursor.fetchall()
-
         bombas_atualizadas = []
         for bomba in bombas:
             id, autoAbastecimento, tipoCombustivel_nome, bombaAtiva, tanque_nome, nomeBomba = bomba
@@ -45,19 +45,39 @@ class ControladorBombaCombustivel:
             WHERE b.bombaAtiva = 1
         """)
         bombas = self.cursor.fetchall()
-
         bombas_atualizadas = []
         for bomba in bombas:
             id_bomba, nomeBomba, tipoCombustivel_nome, tipoCombustivel_preco  = bomba
             bomba_atualizada = (nomeBomba, tipoCombustivel_nome, tipoCombustivel_preco,id_bomba )
             bombas_atualizadas.append(bomba_atualizada)
-        
+
         return bombas_atualizadas
+
+    def validar_disponibilidade_combustivel(self, idBomba, litros):
+        try:
+            self.cursor.execute("""
+                SELECT t.volumeAtual , t.id
+                FROM Tanques t 
+                JOIN Bombas b ON t.id = b.tanque_id
+                WHERE b.id = ?
+            """, (idBomba))
+
+            volume_atual_tanque = self.cursor.fetchone()          
+
+            volume_atual, id_tanque = volume_atual_tanque
+
+            if volume_atual_tanque and volume_atual >= litros:
+                self.controladorTanqueCombustivel.atualizar_volume_tanque(id_tanque,litros)
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(f"Erro ao validar disponibilidade de combustível: {e}")
+            return False
 
     def buscar_bomba(self, identificadorBomba):
         self.cursor.execute("SELECT * FROM Bombas WHERE id = ?", (identificadorBomba,))
         return self.cursor.fetchone()
-
     def remover_bomba(self, identificadorBomba):
         try:
             with self.conn:
@@ -65,7 +85,6 @@ class ControladorBombaCombustivel:
                 return self.cursor.rowcount > 0
         except sqlite3.Error as e:
             return e
-
     def atualizar_bomba(self, autoAbastecimento, tipoCombustivel, bombaAtiva, tanque, nomeBomba, identificadorBomba):
         try:
             with self.conn:
@@ -99,6 +118,5 @@ class ControladorBombaCombustivel:
         except sqlite3.Error as e:
             print(f"Erro ao atualizar a bomba: {e}")
             return False
-
     def __del__(self):
         self.conn.close()
