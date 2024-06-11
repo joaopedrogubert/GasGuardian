@@ -8,7 +8,7 @@ from .TelaTanqueCombustivel import TelaTanqueCombustivel  # Importação da clas
 from .telaBombaCombustivel import TelaBombaCombustivel  # Importação da classe TelaBombaCombustivel
 from .TelaPosto import TelaPosto  # Importação da classe TelaPosto
 from .telaAbastecimento import TelaAbastecimento  # Importação da classe TelaAbastecimento
-
+from .telaUsuarios import TelaUsuario  # Importação da classe TelaUsuario
 class MenuPrincipal(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -59,6 +59,7 @@ class MenuPrincipal(ctk.CTk):
         self.add_menu_item(cadastro_id, "bombas", "Bombas", icon_path_base + "bomba-de-gasolina.png")
         self.add_menu_item(cadastro_id, "posto", "Posto", icon_path_base + "posto.png")
 
+
         self.add_menu_item("", "relatorios", "Relatórios", icon_path_base + "relatorios.png", True)
 
         # Configuração das tags
@@ -73,6 +74,7 @@ class MenuPrincipal(ctk.CTk):
         self.frames["bombas"] = TelaBombaCombustivel(self)
         self.frames["posto"] = TelaPosto(self)
         self.frames["abastecimento"] = TelaAbastecimento(self)
+        self.frames["funcionarios"] = TelaUsuario(self)
 
         for frame in self.frames.values():
             frame.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
