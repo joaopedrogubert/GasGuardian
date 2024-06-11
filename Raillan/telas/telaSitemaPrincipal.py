@@ -9,6 +9,7 @@ from .telaBombaCombustivel import TelaBombaCombustivel  # Importação da classe
 from .TelaPosto import TelaPosto  # Importação da classe TelaPosto
 from .telaAbastecimento import TelaAbastecimento  # Importação da classe TelaAbastecimento
 from .telaUsuarios import TelaUsuario  # Importação da classe TelaUsuario
+
 class MenuPrincipal(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -28,6 +29,13 @@ class MenuPrincipal(ctk.CTk):
         self.current_frame = None
         self.create_frames()
 
+        # Atualizar as cores do texto de acordo com o tema
+        self.update_text_colors()
+
+        # Bind para mudança de tema
+        ctk.set_appearance_mode("system")
+        self.update_text_colors()
+
     def configure_grid(self):
         self.grid_columnconfigure(0, weight=0, minsize=300)  # Largura fixa do menu
         self.grid_columnconfigure(1, weight=4)
@@ -39,7 +47,8 @@ class MenuPrincipal(ctk.CTk):
         self.menu_frame.grid(row=0, column=0, sticky="nswe", padx=10, pady=10)
 
         # Label do Menu
-        ctk.CTkLabel(self.menu_frame, text="Posto do Chico", font=("Arial", 30, "bold")).pack(pady=20)
+        self.menu_label = ctk.CTkLabel(self.menu_frame, text="Posto do Chico", font=("Arial", 30, "bold"))
+        self.menu_label.pack(pady=20)
 
         self.tree_menu = ttk.Treeview(self.menu_frame, show="tree", selectmode="browse")
         self.tree_menu.pack(fill="both", expand=True)
@@ -50,7 +59,7 @@ class MenuPrincipal(ctk.CTk):
 
         # Adicionando itens ao menu
         icon_path_base = "/Users/railanabreu/Documents/Projects/GasGuardian/Raillan/telas/Icones/"
-        self.add_menu_item("", "abastecimento", "Abastecimento", icon_path_base + "afundando.png", True)
+        self.add_menu_item("", "abastecimento", "Abastecimento", icon_path_base + "fuel-pump.png", True)
         # Adicionando item "Cadastro" com ícone
         cadastro_id = self.add_menu_item("", "cadastro", "Cadastro", icon_path_base + "cadastro.png", True)
         self.add_menu_item(cadastro_id, "funcionarios", "Funcionários", icon_path_base + "Funcionarios.png")
@@ -59,17 +68,20 @@ class MenuPrincipal(ctk.CTk):
         self.add_menu_item(cadastro_id, "bombas", "Bombas", icon_path_base + "bomba-de-gasolina.png")
         self.add_menu_item(cadastro_id, "posto", "Posto", icon_path_base + "posto.png")
 
-
         self.add_menu_item("", "relatorios", "Relatórios", icon_path_base + "relatorios.png", True)
 
+        estoque_id = self.add_menu_item("", "Estoque", "Estoque", icon_path_base + "oil-tank.png", True)
+        self.add_menu_item(estoque_id, "Renovacao", "Renovacão", icon_path_base + "oil-tanker.png")
+
         # Configuração das tags
-        self.tree_menu.tag_configure("main", font=("Arial", 30, "bold"), foreground="white")
-        self.tree_menu.tag_configure("sub", font=("Arial", 25, "bold"), foreground="white")
+        self.tree_menu.tag_configure("main", font=("Arial", 30, "bold"))
+        self.tree_menu.tag_configure("sub", font=("Arial", 25, "bold"))
 
         self.tree_menu.bind("<<TreeviewSelect>>", self.on_menu_select)
 
     def create_frames(self):
         # Adicionar os frames que você deseja exibir ao clicar nos submenus
+       
         self.frames["tanques"] = TelaTanqueCombustivel(self)
         self.frames["bombas"] = TelaBombaCombustivel(self)
         self.frames["posto"] = TelaPosto(self)
@@ -115,7 +127,28 @@ class MenuPrincipal(ctk.CTk):
             frame.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
             self.current_frame = frame
 
+    def update_text_colors(self):
+        theme = ctk.get_appearance_mode()
+        if theme == "Dark":
+            text_color = "white"
+        else:
+            text_color = "black"
+
+        # Atualizar as cores das tags
+        self.tree_menu.tag_configure("main", foreground=text_color)
+        self.tree_menu.tag_configure("sub", foreground=text_color)
+
+        # Atualizar a cor do label do menu
+        self.menu_label.configure(text_color=text_color)
+
+        # Atualizar a cor do texto no Treeview
+        self.tree_menu.tag_configure("main", foreground=text_color)
+        self.tree_menu.tag_configure("sub", foreground=text_color)
+
+    def on_theme_change(self, event=None):
+        self.update_text_colors()
+
 if __name__ == '__main__':
-    ctk.set_appearance_mode("dark")
+    ctk.set_appearance_mode("system")  # Usar o modo do sistema
     app = MenuPrincipal()
     app.mainloop()
