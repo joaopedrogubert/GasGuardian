@@ -36,6 +36,23 @@ class ControladorBombaCombustivel:
             bombas_atualizadas.append(bomba_atualizada)
         
         return bombas_atualizadas
+    
+    def listar_bombas_ativas(self):
+        self.cursor.execute("""
+            SELECT b.id,b.nomeBomba, b.tipoCombustivel_nome, t.preco AS tipoCombustivel_preco
+            FROM Bombas b
+            JOIN TipoCombustivel t ON b.tipoCombustivel_nome = t.nome
+            WHERE b.bombaAtiva = 1
+        """)
+        bombas = self.cursor.fetchall()
+
+        bombas_atualizadas = []
+        for bomba in bombas:
+            id_bomba, nomeBomba, tipoCombustivel_nome, tipoCombustivel_preco  = bomba
+            bomba_atualizada = (nomeBomba, tipoCombustivel_nome, tipoCombustivel_preco,id_bomba )
+            bombas_atualizadas.append(bomba_atualizada)
+        
+        return bombas_atualizadas
 
     def buscar_bomba(self, identificadorBomba):
         self.cursor.execute("SELECT * FROM Bombas WHERE id = ?", (identificadorBomba,))

@@ -241,7 +241,7 @@ class TelaBombaCombustivel(ctk.CTkFrame):
         self.entries = {}
 
         combustiveis = self.controladorTipoCombustivel.listar_tipo_combustivel()
-        nomes_combustiveis = [combustivel[0] for combustivel in combustiveis]
+        nomes_combustiveis = {combustivel[0]: combustivel[1] for combustivel in combustiveis}
 
         tanques = self.controladorTanqueCombustivel.listar_tanques()
         nomes_tanques = {tanque[0]: tanque[6] for tanque in tanques}
@@ -252,7 +252,7 @@ class TelaBombaCombustivel(ctk.CTkFrame):
 
             if label == "Tipo de Combustível":
                 self.combustivel_var = tk.StringVar()
-                entry = ttk.Combobox(self.modal, textvariable=self.combustivel_var, values=nomes_combustiveis)
+                entry = ttk.Combobox(self.modal, textvariable=self.combustivel_var, values=nomes_combustiveis.keys())
                 entry.grid(row=i+1, column=1, padx=10, pady=5, sticky='we')
 
             elif label == "Tanque":

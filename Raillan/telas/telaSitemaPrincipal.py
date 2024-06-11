@@ -7,6 +7,7 @@ import os
 from .TelaTanqueCombustivel import TelaTanqueCombustivel  # Importação da classe TelaTanqueCombustivel
 from .telaBombaCombustivel import TelaBombaCombustivel  # Importação da classe TelaBombaCombustivel
 from .TelaPosto import TelaPosto  # Importação da classe TelaPosto
+from .telaAbastecimento import TelaAbastecimento  # Importação da classe TelaAbastecimento
 
 class MenuPrincipal(ctk.CTk):
     def __init__(self):
@@ -71,6 +72,7 @@ class MenuPrincipal(ctk.CTk):
         self.frames["tanques"] = TelaTanqueCombustivel(self)
         self.frames["bombas"] = TelaBombaCombustivel(self)
         self.frames["posto"] = TelaPosto(self)
+        self.frames["abastecimento"] = TelaAbastecimento(self)
 
         for frame in self.frames.values():
             frame.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
