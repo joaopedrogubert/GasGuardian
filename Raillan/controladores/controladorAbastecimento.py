@@ -14,7 +14,7 @@ class ControladorAbastecimento:
         self.cursor = self.conn.cursor()
         self.conn.commit()
 
-    def verificar_abastecimento(self, idBomba, tipoCombustivel, preco, litros):
+    def verificar_abastecimento(self, idBomba, litros):
         # Verificar se a bomba está ativa
         bomba = self.controlador_bomba.buscar_bomba(idBomba)
         print(bomba)
